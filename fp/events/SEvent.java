@@ -7,12 +7,14 @@ public class SEvent extends Event {
     private static final HashMap<String, Integer> codemap = new HashMap<>();
     private static final ArrayList<String> namemap = new ArrayList<>();
     public static final int SIGEXIT;
-    public final Object sender;
-    public final int sigcode;
+    public static final int SIGTICK;
     static {
         Event.setFmt(EventType.Signal, SEvent.class);
         SIGEXIT = registerSignal("SIGEXIT");
+        SIGTICK = registerSignal("SIGTICK");
     }
+    public final Object sender;
+    public final int sigcode;
     public static int registerSignal(String name) {
         int c = namemap.size();
         codemap.put(name, c);

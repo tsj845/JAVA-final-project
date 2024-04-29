@@ -42,7 +42,6 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
     }
     private static void init() {
         // try {StdDraw.c.await();} catch(Exception E) {E.printStackTrace();}
-        System.out.println("THROUGH C1");
         StdDraw.frame.addKeyListener(ob);
         while (!StdDraw.inited);
         StdDraw.draw.addMouseListener(ob);

@@ -1,5 +1,6 @@
 package fp;
 
+import fp.entities.Player;
 import fp.events.Event;
 import fp.events.EventListener;
 import fp.events.EventType;
@@ -11,7 +12,7 @@ import fp.events.StateEvent;
 public class Main implements EventListener {
     private static int quickCode = StateEvent.getCode();
     public void trigger(Event e) {
-        if (e.type.any(EventType.MouseMove, EventType.MouseDrag)) return;
+        if (e.type.any(EventType.MouseMove, EventType.MouseDrag, EventType.Signal)) return;
         System.out.println(e.type);
         if (e.type.key()) {
             System.out.println(((KEvent)e));
@@ -31,17 +32,27 @@ public class Main implements EventListener {
         }
     }
     public static void main(String[] args) {
+        StdDraw.enableDoubleBuffering();
         Main m = new Main();
         Observer.register(m);
-        int repcode = SEvent.registerSignal("MAINREP");
+        boolean aloop = true;
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("noloop")) {
+                aloop = false;
+                break;
+            }
+        }
+        final boolean loop = aloop;
+        System.out.println(SEvent.SIGTICK);
+        new Player();
         new Thread(){
             public void run() {
                 do {
-                    Observer.signal(new SEvent(this, repcode));
+                    Observer.signal(new SEvent(null, SEvent.SIGTICK));
                     try {
-                        sleep(1000);
+                        sleep(10);
                     } catch (InterruptedException E) {}
-                } while (false);
+                } while (loop);
             }
         }.start();
     }
