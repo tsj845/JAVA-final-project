@@ -640,6 +640,8 @@ import java.util.NoSuchElementException;
      protected static JFrame frame;
      protected static CountDownLatch c = new CountDownLatch(1);
      protected static CountDownLatch c2 = new CountDownLatch(1);
+     protected static boolean inited = false;
+     protected static JLabel draw;
  
      // mouse state
      private static boolean isMousePressed = false;
@@ -704,6 +706,7 @@ import java.util.NoSuchElementException;
  
      // init
      private static void init() {
+        synchronized(c) {
          // JFrame stuff
          if (frame == null) {
              frame = new JFrame();
@@ -750,16 +753,21 @@ import java.util.NoSuchElementException;
  
          // ImageIcon stuff
          RetinaImageIcon icon = new RetinaImageIcon(onscreenImage);
-         JLabel draw = new JLabel(icon);
+         draw = new JLabel(icon);
          draw.addMouseListener(std);
          draw.addMouseMotionListener(std);
+        //  draw.addMouseListener(Observer.ob);
+        //  draw.addMouseMotionListener(Observer.ob);
  
          // JFrame stuff
          frame.setContentPane(draw);
          frame.pack();
          frame.requestFocusInWindow();
          frame.setVisible(true);
-         c.countDown();
+        //  c.countDown();
+        //  Observer.init();
+         inited = true;
+        }
      }
  
      // create the menu bar
@@ -1956,7 +1964,6 @@ import java.util.NoSuchElementException;
      @Override
      public void mousePressed(MouseEvent e) {
          synchronized (MOUSE_LOCK) {
-             System.out.println("MDOWNSTDAGAIN");
              mouseX = StdDraw.userX(e.getX());
              mouseY = StdDraw.userY(e.getY());
              isMousePressed = true;

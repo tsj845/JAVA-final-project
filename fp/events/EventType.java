@@ -47,7 +47,7 @@ public class EventType {
     }
     public boolean any(EventType...k) {
         for (EventType o : k) {
-            if (this.superkind == o.superkind) return true;
+            if (this.superkind == o.superkind && this.subcode == o.subcode) return true;
         }
         return false;
     }

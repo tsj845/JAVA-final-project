@@ -20,7 +20,7 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
     private static final Object MOUSE_LOCK = new Object();
     private static final Object KEY_LOCK = new Object();
     private static final Object SIG_LOCK = new Object();
-    private static final Observer ob = new Observer();
+    protected static final Observer ob = new Observer();
     // private static class KeyData implements Comparable<KeyData> {
     //     final int keycode;
     //     int timedown = 0;
@@ -38,13 +38,15 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
     private static volatile boolean mouse_down = false;
     private static volatile double mX, mY = 0.0d;
     static {init();}
-    private Observer() {}
-    private static void init() {
-        try {StdDraw.c.await();} catch(Exception E) {E.printStackTrace();}
+    private Observer() {
+    }
+    protected static void init() {
+        // try {StdDraw.c.await();} catch(Exception E) {E.printStackTrace();}
         System.out.println("THROUGH C1");
         StdDraw.frame.addKeyListener(ob);
-        StdDraw.frame.getContentPane().addMouseListener(ob);
-        StdDraw.frame.getContentPane().addMouseMotionListener(ob);
+        while (!StdDraw.inited);
+        StdDraw.draw.addMouseListener(ob);
+        StdDraw.draw.addMouseMotionListener(ob);
         // StdDraw.c2.countDown();
         // System.out.println("DONE C2");
     }
