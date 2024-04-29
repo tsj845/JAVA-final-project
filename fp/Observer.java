@@ -7,6 +7,7 @@ import fp.events.Event;
 import fp.events.EventListener;
 import fp.events.EventType;
 import fp.events.KEvent;
+import fp.events.MEvent;
 
 import java.awt.event.*;
 
@@ -34,12 +35,18 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
     // }
     // private static final TreeSet<KeyData> keys_down = new TreeSet<>();
     private static final TreeSet<Integer> keys_down = new TreeSet<>();
+    private static volatile boolean mouse_down = false;
+    private static volatile double mX, mY = 0.0d;
     static {init();}
     private Observer() {}
     private static void init() {
+        try {StdDraw.c.await();} catch(Exception E) {E.printStackTrace();}
+        System.out.println("THROUGH C1");
         StdDraw.frame.addKeyListener(ob);
-        StdDraw.frame.addMouseListener(ob);
-        StdDraw.frame.addMouseMotionListener(ob);
+        StdDraw.frame.getContentPane().addMouseListener(ob);
+        StdDraw.frame.getContentPane().addMouseMotionListener(ob);
+        // StdDraw.c2.countDown();
+        // System.out.println("DONE C2");
     }
     public static void register(EventListener el) {
         listeners.add(el);
@@ -52,6 +59,16 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
             for (EventListener el : listeners) {
                 el.trigger(sig);
             }
+        }
+    }
+    public static boolean mouseDown() {
+        synchronized(MOUSE_LOCK) {
+            return mouse_down;
+        }
+    }
+    public static boolean keyDown(int keycode) {
+        synchronized(KEY_LOCK) {
+            return keys_down.contains(keycode);
         }
     }
     private static char _vkcToChar(int keycode) {
@@ -133,11 +150,13 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
         }
     }
     private static char vkcToChar(int keycode) {
+        System.out.println(String.format("KEYCODE: 0x%x", keycode));
         char c = _vkcToChar(keycode);
-        return ((KeyEvent.SHIFT_DOWN_MASK&keycode) != 0) ? (Character.isAlphabetic(c) ? Character.toUpperCase(c) : _vkcManUpper(c)) : c;
+        return (keys_down.contains(17)&&c>64) ? (char)(c-((char)64)) : ((keys_down.contains(16)) ? ((Character.isAlphabetic(c) ? Character.toUpperCase(c) : _vkcManUpper(c))) : c);
     }
     @Override
     public void keyTyped(KeyEvent e) {
+        if (e.getKeyChar() == 3) System.exit(2);
         synchronized(KEY_LOCK) {
             Observer.signal(new KEvent(EventType.KeyPress, e.getKeyChar()));
         }
@@ -147,7 +166,7 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
         synchronized(KEY_LOCK) {
             // Observer.keys_down.add(new KeyData(e.getKeyCode()));
             Observer.keys_down.add(e.getKeyCode());
-            Observer.signal(new KEvent(EventType.KeyDown, e.getKeyCode()));
+            Observer.signal(new KEvent(EventType.KeyDown, Observer.vkcToChar(e.getKeyCode()), e.getKeyCode()));
         }
     }
     @Override
@@ -163,19 +182,43 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
             // }
             // Observer.keys_down.remove(kd);
             Observer.keys_down.remove(e.getKeyCode());
-            Observer.signal(new KEvent(EventType.KeyUp, e.getKeyCode()));
+            Observer.signal(new KEvent(EventType.KeyUp, Observer.vkcToChar(e.getKeyCode()), e.getKeyCode()));
         }
     }
     @Override
-    public void mouseDragged(MouseEvent e) {}
+    public void mouseDragged(MouseEvent e) {
+        synchronized(MOUSE_LOCK) {
+            Observer.mX = StdDraw.userX(e.getX());
+            Observer.mY = StdDraw.userY(e.getY());
+            Observer.signal(new MEvent(EventType.MouseDrag, new FPoint(Observer.mX, Observer.mY)));
+        }
+    }
     @Override
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+        synchronized(MOUSE_LOCK) {
+            Observer.mX = StdDraw.userX(e.getX());
+            Observer.mY = StdDraw.userY(e.getY());
+            Observer.signal(new MEvent(EventType.MouseMove, new FPoint(Observer.mX, Observer.mY)));
+        }
+    }
     @Override
     public void mouseClicked(MouseEvent e) {}
     @Override
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+        synchronized(MOUSE_LOCK) {
+            Observer.mouse_down = true;
+            Observer.mX = StdDraw.userX(e.getX());
+            Observer.mY = StdDraw.userY(e.getY());
+            Observer.signal(new MEvent(EventType.MouseDown, new FPoint(Observer.mX, Observer.mY)));
+        }
+    }
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+        synchronized(MOUSE_LOCK) {
+            Observer.mouse_down = false;
+            Observer.signal(new MEvent(EventType.MouseUp, new FPoint(Observer.mX, Observer.mY)));
+        }
+    }
     @Override
     public void mouseEntered(MouseEvent e) {}
     @Override

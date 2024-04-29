@@ -6,23 +6,23 @@ public class KEvent extends Event {
     static {
         Event.setFmt(EventType.Key, KEvent.class);
     }
-    public KEvent(EventType et, Object data) {
+    public KEvent(EventType et, char key) {
         super(et);
-        if (data instanceof Integer) {
-            code = (Integer)data;
-            key = 0;
-        } else if (data instanceof Character) {
-            code = 0;
-            key = (Character)data;
-        } else {
-            throw new IllegalArgumentException();
-        }
+        if (!et.equals(EventType.Key)) throw new IllegalArgumentException("KEvent must be of key event type");
+        code = 0;
+        this.key = key;
+    }
+    public KEvent(EventType et, char key, int code) {
+        super(et);
+        if (!et.equals(EventType.Key)) throw new IllegalArgumentException("KEvent must be of key event type");
+        this.code = code;
+        this.key = key;
     }
     protected String strData() {
         if (type == EventType.KeyPress) {
             return Character.toString(key);
         } else {
-            return Integer.toString(code);
+            return Integer.toString(code) + " (" + Character.toString(key) + ")";
         }
     }
 }

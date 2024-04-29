@@ -1,0 +1,1 @@
+javac fp/**.java && java fp/Main

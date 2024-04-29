@@ -65,7 +65,8 @@ package fp;
  
  import java.util.LinkedList;
  import java.util.TreeSet;
- import java.util.NoSuchElementException;
+import java.util.concurrent.CountDownLatch;
+import java.util.NoSuchElementException;
  import javax.imageio.ImageIO;
  
  import javax.swing.ImageIcon;
@@ -637,6 +638,8 @@ package fp;
  
      // the frame for drawing to the screen
      protected static JFrame frame;
+     protected static CountDownLatch c = new CountDownLatch(1);
+     protected static CountDownLatch c2 = new CountDownLatch(1);
  
      // mouse state
      private static boolean isMousePressed = false;
@@ -704,6 +707,10 @@ package fp;
          // JFrame stuff
          if (frame == null) {
              frame = new JFrame();
+            //  c.countDown();
+            //  System.out.println("DONE C1");
+            //  try{c2.await();}catch(Exception E){E.printStackTrace();}
+            //  System.out.println("THROUGH C2");
              frame.addKeyListener(std);    // JLabel cannot get keyboard focus
              frame.setFocusTraversalKeysEnabled(false);  // allow VK_TAB with isKeyPressed()
              frame.setResizable(false);
@@ -752,6 +759,7 @@ package fp;
          frame.pack();
          frame.requestFocusInWindow();
          frame.setVisible(true);
+         c.countDown();
      }
  
      // create the menu bar
@@ -897,8 +905,8 @@ package fp;
      private static double  scaleY(double y) { return height * (ymax - y) / (ymax - ymin); }
      private static double factorX(double w) { return w * width  / Math.abs(xmax - xmin);  }
      private static double factorY(double h) { return h * height / Math.abs(ymax - ymin);  }
-     private static double   userX(double x) { return xmin + x * (xmax - xmin) / width;    }
-     private static double   userY(double y) { return ymax - y * (ymax - ymin) / height;   }
+     protected static double   userX(double x) { return xmin + x * (xmax - xmin) / width;    }
+     protected static double   userY(double y) { return ymax - y * (ymax - ymin) / height;   }
  
  
      /**
@@ -1948,6 +1956,7 @@ package fp;
      @Override
      public void mousePressed(MouseEvent e) {
          synchronized (MOUSE_LOCK) {
+             System.out.println("MDOWNSTDAGAIN");
              mouseX = StdDraw.userX(e.getX());
              mouseY = StdDraw.userY(e.getY());
              isMousePressed = true;
