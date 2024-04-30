@@ -1,1 +1,1 @@
-javac fp/**.java && java fp/Main
+javac fp/**.java && java fp/Main "$@"

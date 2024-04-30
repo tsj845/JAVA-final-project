@@ -1,5 +1,10 @@
 package fp;
 
+import fp.drawing.DrawManager;
+import fp.drawing.Shape;
+import fp.drawing.ShapeBuilder;
+import fp.drawing.Transform;
+import fp.entities.Collider;
 import fp.entities.Player;
 import fp.events.Event;
 import fp.events.EventListener;
@@ -31,6 +36,36 @@ public class Main implements EventListener {
             }
         }
     }
+    public static void tick() {
+        new Thread(){
+            public void run() {
+                do {
+                    Observer.signal(new SEvent(null, SEvent.SIGTICK));
+                    try {
+                        sleep(10);
+                    } catch (InterruptedException E) {}
+                } while (true);
+            }
+        }.start();
+    }
+    public static void coltest() {
+        Transform t1 = new Transform(new FPoint(0.5, 0.5), 0.0);
+        Transform t2 = new Transform(new FPoint(0.5, 0.5), 0.0);
+        Shape s1 = Shape.Rect(0.2, 0.2, t1);
+        Shape s2 = Shape.Circle(0.05, t2);
+        s1.fill = null;
+        s2.fill = null;
+        s1.stroke = StdDraw.BLUE;
+        s2.stroke = StdDraw.GREEN;
+        s1.strokewidth = 0.02;
+        s2.strokewidth = 0.02;
+        DrawManager.add(s1);
+        DrawManager.add(s2);
+        Collider c1 = Collider.boxCollider(t1, 0.2, 0.2);
+        Collider c2 = Collider.circleCollider(t2, 0.05);
+        Observer.signal(new SEvent(null, SEvent.SIGTICK));
+        System.out.println(c1.collides(c2));
+    }
     public static void main(String[] args) {
         StdDraw.enableDoubleBuffering();
         Main m = new Main();
@@ -43,17 +78,9 @@ public class Main implements EventListener {
             }
         }
         final boolean loop = aloop;
-        System.out.println(SEvent.SIGTICK);
-        new Player();
-        new Thread(){
-            public void run() {
-                do {
-                    Observer.signal(new SEvent(null, SEvent.SIGTICK));
-                    try {
-                        sleep(10);
-                    } catch (InterruptedException E) {}
-                } while (loop);
-            }
-        }.start();
+        // new Player();
+        coltest();
+        // Observer.signal(new SEvent(null, SEvent.SIGTICK));
+        if (loop) tick();
     }
 }

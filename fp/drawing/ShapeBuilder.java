@@ -18,6 +18,9 @@ public class ShapeBuilder {
         points.add(p);
     }
     public Shape toShape() {
-        return new Shape(points.toArray(FPoint[]::new));
+        return Shape.Poly(points.toArray(FPoint[]::new));
+    }
+    public Shape withTransform(Transform t) {
+        return Shape.Poly(points.toArray(FPoint[]::new), t);
     }
 }
