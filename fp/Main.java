@@ -29,19 +29,20 @@ public class Main implements EventListener {
         // System.out.println(e.type);
         if (e.type.key()) {
             KEvent ke = (KEvent)e;
+            int N = 0;
             if (ke.type == EventType.KeyUp) {
                 if (ke.code == KeyEvent.VK_RIGHT) {
-                    shps[2].transform.translate(right);
+                    shps[N].transform.translate(right);
                 } else if (ke.code == KeyEvent.VK_LEFT) {
-                    shps[2].transform.translate(left);
+                    shps[N].transform.translate(left);
                 } else if (ke.code == KeyEvent.VK_UP) {
-                    shps[2].transform.translate(up);
+                    shps[N].transform.translate(up);
                 } else if (ke.code == KeyEvent.VK_DOWN) {
-                    shps[2].transform.translate(down);
+                    shps[N].transform.translate(down);
                 } else if (ke.code == KeyEvent.VK_Q) {
-                    shps[2].transform.rotate(-5);
+                    shps[N].transform.rotate(-5);
                 } else if (ke.code == KeyEvent.VK_E) {
-                    shps[2].transform.rotate(5);
+                    shps[N].transform.rotate(5);
                 } else {
                     return;
                 }
