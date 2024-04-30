@@ -151,7 +151,6 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
         }
     }
     private static char vkcToChar(int keycode) {
-        System.out.println(String.format("KEYCODE: 0x%x", keycode));
         char c = _vkcToChar(keycode);
         return (keys_down.contains(17)&&c>64) ? (char)(c-((char)64)) : ((keys_down.contains(16)) ? ((Character.isAlphabetic(c) ? Character.toUpperCase(c) : _vkcManUpper(c))) : c);
     }

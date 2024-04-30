@@ -1,7 +1,6 @@
 package fp.entities;
 
 import fp.FPoint;
-import fp.StdDraw;
 import fp.drawing.Transform;
 
 public class Collider {
@@ -78,10 +77,10 @@ public class Collider {
     // TODO
     public static Collider triangleCollider(Transform t, FPoint p1, FPoint p2, FPoint p3) {
         Collider c = new Collider(ColliderType.Triangle, t);
-        // FPoint center = FPoint.average(p1, p2, p3);
         c.cache = new CLine[]{new CLine(p1, p2),new CLine(p2, p3),new CLine(p3, p1),null,null,null};
         c.cache[3] = new CLine(p1, p2);
-        FPoint center = new FPoint();
+        FPoint center = FPoint.average(p1, p2, p3);
+        // FPoint center = new FPoint();
         c.data = new double[]{p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,center.x,center.y};
         return c;
     }
@@ -123,6 +122,19 @@ public class Collider {
         CLine[] c = cbox.cache;
         return new CLine[]{c[0].getTransformed(t),c[1].getTransformed(t),c[2].getTransformed(t),c[3].getTransformed(t)};
     }
+    private static CLine[] cTriGetTransformed(Collider ctri) {
+        Transform t = ctri.transform;
+        CLine[] c = ctri.cache;
+        return new CLine[]{c[0].getTransformed(t),c[1].getTransformed(t),c[2].getTransformed(t)};
+
+    }
+    private static boolean cBoxContains(CLine[] tcache, FPoint center, FPoint p) {
+        CLine chk = new CLine(center, p);
+        for (CLine tst : tcache) {
+            if (chk.intersects(tst)) return false;
+        }
+        return true;
+    }
     private static boolean cBoxContains(Collider cbox, FPoint p) {
         CLine[] tcache = cBoxGetTransformed(cbox);
         CLine chk = new CLine(cbox.transform.getTranslation(), p);
@@ -132,7 +144,10 @@ public class Collider {
         return true;
     }
     private static boolean cBoxBox(Collider c1, Collider c2) {
-        return true;
+        CLine[] tc1 = cBoxGetTransformed(c1);
+        CLine[] tc2 = cBoxGetTransformed(c2);
+        FPoint c = c1.transform.getTranslation();
+        return cBoxContains(tc1, c, tc2[0].p1) || cBoxContains(tc1, c, tc2[1].p1) || cBoxContains(tc1, c, tc2[2].p1) || cBoxContains(tc1, c, tc2[3].p1);
     }
     private static boolean cBoxCirc(Collider c1, Collider c2) {
         System.out.println("BC");
@@ -140,16 +155,18 @@ public class Collider {
         CLine[] tcache = cBoxGetTransformed(c1);
         CLine hchk = new CLine(ccenter, tcache[0].angle-90, c2.data[0]).mirror(true);
         CLine vchk = new CLine(ccenter, tcache[1].angle-90, c2.data[0]).mirror(true);
-        StdDraw.setPenColor();
-        StdDraw.setPenRadius(0.005);
-        StdDraw.line(hchk.p1.x, hchk.p1.y, hchk.p2.x, hchk.p2.y);
-        StdDraw.line(vchk.p1.x, vchk.p1.y, vchk.p2.x, vchk.p2.y);
-        StdDraw.show();
         boolean corners = Math.min(Math.min(tcache[0].p1.sqDist(ccenter),tcache[1].p1.sqDist(ccenter)),Math.min(tcache[2].p1.sqDist(ccenter),tcache[3].p1.sqDist(ccenter))) <= c2.data[1];
         return corners || hchk.intersects(tcache[0]) || hchk.intersects(tcache[2]) || vchk.intersects(tcache[1]) || vchk.intersects(tcache[3]) || cBoxContains(c1, ccenter);
     }
     private static boolean cBoxTri(Collider c1, Collider c2) {
-        return true;
+        CLine[] bc = cBoxGetTransformed(c1);
+        FPoint c = c1.transform.getTranslation();
+        CLine[] tc = cTriGetTransformed(c2);
+        return (
+            cBoxContains(bc, c, tc[0].p1) || cBoxContains(bc, c, tc[1].p1) || cBoxContains(bc, c, tc[2].p1) ||
+            bc[0].intersects(tc[0]) || bc[0].intersects(tc[1]) || bc[0].intersects(tc[2]) ||
+            bc[1].intersects(tc[0]) || bc[1].intersects(tc[1]) || bc[1].intersects(tc[2])
+        );
     }
     private static boolean cCircCirc(Collider c1, Collider c2) {
         return c1.transform.getTranslation().sqDist(c2.transform.getTranslation()) <= (c1.data[1]+c2.data[1]);

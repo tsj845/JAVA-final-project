@@ -6,12 +6,14 @@ import java.util.HashMap;
 public class SEvent extends Event {
     private static final HashMap<String, Integer> codemap = new HashMap<>();
     private static final ArrayList<String> namemap = new ArrayList<>();
-    public static final int SIGEXIT;
-    public static final int SIGTICK;
+    public static final int SIGEXIT, SIGTICK;
+    public static final SEvent EXIT, TICK;
     static {
         Event.setFmt(EventType.Signal, SEvent.class);
         SIGEXIT = registerSignal("SIGEXIT");
         SIGTICK = registerSignal("SIGTICK");
+        EXIT = new SEvent(null, SIGEXIT);
+        TICK = new SEvent(null, SIGTICK);
     }
     public final Object sender;
     public final int sigcode;

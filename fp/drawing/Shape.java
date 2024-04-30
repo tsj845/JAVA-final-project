@@ -74,10 +74,10 @@ public class Shape {
         return new Shape(ShapeType.Circ, new FPoint[]{new FPoint(0.0, radius)}, t);
     }
     public static Shape Poly(FPoint[] points) {
-        return new Shape(ShapeType.Poly, points);
+        return new Shape(ShapeType.Poly, FPoint.normalize(points));
     }
     public static Shape Poly(FPoint[] points, Transform t) {
-        return new Shape(ShapeType.Poly, points, t);
+        return new Shape(ShapeType.Poly, FPoint.normalize(points), t);
     }
     public void addShape(Shape s) {
         if (shapes == null) throw new IllegalArgumentException();

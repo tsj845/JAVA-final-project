@@ -17,7 +17,20 @@ public class FPoint {
         return Math.abs(x-o.x)<=FPoint.EPSILON && Math.abs(y-o.y)<=FPoint.EPSILON;
     }
     public static FPoint average(FPoint...fps) {
-        return new FPoint();
+        double x = 0.0, y = 0.0;
+        for (FPoint fp : fps) {
+            x += fp.x;
+            y += fp.y;
+        }
+        return new FPoint(x/(double)fps.length, y/(double)fps.length);
+    }
+    public static FPoint[] normalize(FPoint[] in) {
+        FPoint c = average(in);
+        FPoint[] out = new FPoint[in.length];
+        for (int i = 0; i < in.length; i ++) {
+            out[i] = in[i].sub(c);
+        }
+        return out;
     }
     public FPoint add(FPoint other) {
         return new FPoint(x+other.x, y+other.y);
