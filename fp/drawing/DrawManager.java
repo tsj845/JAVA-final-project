@@ -9,22 +9,22 @@ import fp.events.EventListener;
 import fp.events.SEvent;
 
 public class DrawManager implements EventListener {
-    private static LinkedList<Shape> stack = new LinkedList<>();
+    private static LinkedList<Drawable> stack = new LinkedList<>();
     private static DrawManager dm = new DrawManager();
     static {Observer.register(dm);}
     private DrawManager() {
     }
     private static void draw() {
         StdDraw.clear();
-        for (Shape s : stack) {
+        for (Drawable s : stack) {
             s.draw();
         }
         StdDraw.show();
     }
-    public static void add(Shape s) {
+    public static void add(Drawable s) {
         stack.add(s);
     }
-    public static boolean remove(Shape s) {
+    public static boolean remove(Drawable s) {
         return stack.remove(s);
     }
     public void trigger(Event e) {

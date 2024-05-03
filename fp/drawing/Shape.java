@@ -3,20 +3,21 @@ package fp.drawing;
 import java.awt.Color;
 import java.util.LinkedList;
 
-import fp.FPoint;
+import fp.Vec2;
 import fp.StdDraw;
 
-public class Shape {
+public class Shape implements Drawable {
     private enum ShapeType {
         Rect,Circ,Poly,Group;
     }
     private final LinkedList<Shape> shapes;
-    private final FPoint[] points;
     private final ShapeType type;
+    public final Vec2[] points;
     public final Transform transform;
-    public Color fill;
-    public Color stroke;
-    public double strokewidth;
+    private Color fill;
+    private Color stroke;
+    private double strokewidth;
+    private double roundness;
     private Shape() {
         this.type = ShapeType.Group;
         this.shapes = new LinkedList<>();
@@ -25,6 +26,7 @@ public class Shape {
         this.fill = null;
         this.stroke = null;
         this.strokewidth = 0.0d;
+        this.roundness = 0.0d;
     }
     private Shape(Transform t) {
         this.type = ShapeType.Group;
@@ -34,8 +36,9 @@ public class Shape {
         this.fill = null;
         this.stroke = null;
         this.strokewidth = 0.0d;
+        this.roundness = 0.0d;
     }
-    private Shape(ShapeType type, FPoint[] points) {
+    private Shape(ShapeType type, Vec2[] points) {
         this.type = type;
         this.points = points;
         this.shapes = null;
@@ -43,8 +46,9 @@ public class Shape {
         this.fill = StdDraw.BLACK;
         this.stroke = StdDraw.BLACK;
         this.strokewidth = 0.0d;
+        this.roundness = 0.0d;
     }
-    private Shape(ShapeType type, FPoint[] points, Transform t) {
+    private Shape(ShapeType type, Vec2[] points, Transform t) {
         this.type = type;
         this.points = points;
         this.shapes = null;
@@ -52,6 +56,7 @@ public class Shape {
         this.fill = StdDraw.BLACK;
         this.stroke = StdDraw.BLACK;
         this.strokewidth = 0.0d;
+        this.roundness = 0.0d;
     }
     public static Shape Group() {
         return new Shape();
@@ -61,23 +66,23 @@ public class Shape {
     }
     public static Shape Rect(double width, double height) {
         double hw = width/2.0d, hh = height/2.0d;
-        return new Shape(ShapeType.Rect, new FPoint[]{new FPoint(-hw,-hh),new FPoint(hw,-hh),new FPoint(hw,hh),new FPoint(-hw,hh)});
+        return new Shape(ShapeType.Rect, new Vec2[]{new Vec2(-hw,-hh),new Vec2(hw,-hh),new Vec2(hw,hh),new Vec2(-hw,hh)});
     }
     public static Shape Rect(double width, double height, Transform t) {
         double hw = width/2.0d, hh = height/2.0d;
-        return new Shape(ShapeType.Rect, new FPoint[]{new FPoint(-hw,-hh),new FPoint(hw,-hh),new FPoint(hw,hh),new FPoint(-hw,hh)}, t);
+        return new Shape(ShapeType.Rect, new Vec2[]{new Vec2(-hw,-hh),new Vec2(hw,-hh),new Vec2(hw,hh),new Vec2(-hw,hh)}, t);
     }
     public static Shape Circle(double radius) {
-        return new Shape(ShapeType.Circ, new FPoint[]{new FPoint(0.0, radius)});
+        return new Shape(ShapeType.Circ, new Vec2[]{new Vec2(0.0, radius)});
     }
     public static Shape Circle(double radius, Transform t) {
-        return new Shape(ShapeType.Circ, new FPoint[]{new FPoint(0.0, radius)}, t);
+        return new Shape(ShapeType.Circ, new Vec2[]{new Vec2(0.0, radius)}, t);
     }
-    public static Shape Poly(FPoint[] points) {
-        return new Shape(ShapeType.Poly, FPoint.normalize(points));
+    public static Shape Poly(Vec2[] points) {
+        return new Shape(ShapeType.Poly, Vec2.normalize(points));
     }
-    public static Shape Poly(FPoint[] points, Transform t) {
-        return new Shape(ShapeType.Poly, FPoint.normalize(points), t);
+    public static Shape Poly(Vec2[] points, Transform t) {
+        return new Shape(ShapeType.Poly, Vec2.normalize(points), t);
     }
     public void addShape(Shape s) {
         if (shapes == null) throw new IllegalArgumentException();
@@ -103,18 +108,29 @@ public class Shape {
             case Poly:
                 double[] x = new double[points.length], y = new double[points.length];
                 int i = 0;
-                for (FPoint p : transform.apply(points)) {
-                    x[i] = p.x;
-                    y[i++] = p.y;
+                // for (Vec2 p : transform.apply(points)) {
+                for (Vec2 p : points) {
+                    x[i] = p.x+0.5;
+                    y[i++] = p.y+0.5;
                 }
-                StdDraw.setPenRadius(strokewidth);
+                if (stroke != null) {
+                    double rad = roundness*strokewidth;
+                    double ewidth = strokewidth - rad;
+                    double[] x2 = new double[points.length], y2 = new double[points.length];
+                    int j = 0;
+                    for (Vec2 p : Transform.scaledBy(points, 1.5)) {
+                    // for (Vec2 p : transform.apply(Transform.scaledAbs(points, ewidth))) {
+                        x2[j] = p.x+0.5;
+                        y2[j++] = p.y+0.5;
+                    }
+                    StdDraw.setPenRadius(rad);
+                    StdDraw.setPenColor(stroke);
+                    StdDraw.filledPolygon(x2, y2);
+                }
+                StdDraw.setPenRadius(0.0d);
                 if (fill != null) {
                     StdDraw.setPenColor(fill);
                     StdDraw.filledPolygon(x, y);
-                }
-                if (strokewidth > 0.0d) {
-                    StdDraw.setPenColor(stroke);
-                    StdDraw.polygon(x, y);
                 }
                 break;
             case Circ:
@@ -123,7 +139,7 @@ public class Shape {
                     StdDraw.setPenColor(fill);
                     StdDraw.filledCircle(transform.getTranslation().x, transform.getTranslation().y, points[0].y);
                 }
-                if (strokewidth > 0.0d) {
+                if (stroke != null) {
                     StdDraw.setPenColor(stroke);
                     StdDraw.circle(transform.getTranslation().x, transform.getTranslation().y, points[0].y);
                 }
@@ -132,4 +148,13 @@ public class Shape {
                 throw new IllegalArgumentException();
         }
     }
+    // accessors
+    public Color fill() {return fill;}
+    public void fill(Color f) {this.fill = f;}
+    public Color stroke() {return stroke;}
+    public void stroke(Color s) {this.stroke = s;}
+    public double strokewidth() {return strokewidth;}
+    public void strokewidth(double w) {this.strokewidth = Math.max(0.0d, w);}
+    public double roundness() {return roundness;}
+    public void roundness(double r) {roundness=Math.max(0.0d, Math.min(r, 100.0d))/100.0d;}
 }

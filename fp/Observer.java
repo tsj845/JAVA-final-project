@@ -190,7 +190,7 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
         synchronized(MOUSE_LOCK) {
             Observer.mX = StdDraw.userX(e.getX());
             Observer.mY = StdDraw.userY(e.getY());
-            Observer.signal(new MEvent(EventType.MouseDrag, new FPoint(Observer.mX, Observer.mY)));
+            Observer.signal(new MEvent(EventType.MouseDrag, new Vec2(Observer.mX, Observer.mY)));
         }
     }
     @Override
@@ -198,7 +198,7 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
         synchronized(MOUSE_LOCK) {
             Observer.mX = StdDraw.userX(e.getX());
             Observer.mY = StdDraw.userY(e.getY());
-            Observer.signal(new MEvent(EventType.MouseMove, new FPoint(Observer.mX, Observer.mY)));
+            Observer.signal(new MEvent(EventType.MouseMove, new Vec2(Observer.mX, Observer.mY)));
         }
     }
     @Override
@@ -209,14 +209,14 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
             Observer.mouse_down = true;
             Observer.mX = StdDraw.userX(e.getX());
             Observer.mY = StdDraw.userY(e.getY());
-            Observer.signal(new MEvent(EventType.MouseDown, new FPoint(Observer.mX, Observer.mY)));
+            Observer.signal(new MEvent(EventType.MouseDown, new Vec2(Observer.mX, Observer.mY)));
         }
     }
     @Override
     public void mouseReleased(MouseEvent e) {
         synchronized(MOUSE_LOCK) {
             Observer.mouse_down = false;
-            Observer.signal(new MEvent(EventType.MouseUp, new FPoint(Observer.mX, Observer.mY)));
+            Observer.signal(new MEvent(EventType.MouseUp, new Vec2(Observer.mX, Observer.mY)));
         }
     }
     @Override

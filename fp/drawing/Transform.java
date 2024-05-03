@@ -1,36 +1,62 @@
 package fp.drawing;
 
-import fp.FPoint;
+import fp.Vec2;
 
 public class Transform {
-    private FPoint translation;
+    private Vec2 translation;
     private double rotation;
+    private double scale;
     public Transform() {
-        this.translation = new FPoint(0.0d, 0.0d);
+        this.translation = new Vec2(0.0d, 0.0d);
         this.rotation = 0.0d;
+        scale = 1.0d;
     }
-    public Transform(FPoint translation, double rotation) {
+    public Transform(Vec2 translation, double rotation) {
         this.translation = translation;
         this.rotation = rotation;
+        scale = 1.0d;
     }
-    public FPoint[] apply(FPoint[] input) {
-        FPoint[] output = new FPoint[input.length];
-        double scomp = Math.sin(Math.toRadians(rotation));
-        double ccomp = Math.cos(Math.toRadians(rotation));
+    public static Vec2[] scaledBy(Vec2[] input, double factor) {
+        Vec2[] output = new Vec2[input.length];
+        Vec2 center = Vec2.average(input);
         for (int i = 0; i < input.length; i ++) {
-            FPoint o = input[i];
-            output[i] = new FPoint((ccomp*o.x)+(scomp*o.y)+translation.x, (-scomp*o.x)+(ccomp*o.y)+translation.y);
+            Vec2 o = input[i];
+            output[i] = center.add(o.rel(center).mul(factor));
+            // output[i] = input[i].mul(factor);
+        }
+        System.out.println("centers:");
+        System.out.println(center);
+        System.out.println(Vec2.average(output));
+        return Vec2.normalize(output);
+    }
+    public static Vec2[] scaledAbs(Vec2[] input, double value) {
+        Vec2[] output = new Vec2[input.length];
+        for (int i = 0; i < input.length; i ++) {
+            Vec2 o = input[i];
+            output[i] = o.add(o.norm().mul(value));
         }
         return output;
     }
-    public FPoint getTranslation() {
+    public Vec2[] apply(Vec2[] input) {
+        Vec2[] output = new Vec2[input.length];
+        double scomp = Math.sin(Math.toRadians(rotation));
+        double ccomp = Math.cos(Math.toRadians(rotation));
+        for (int i = 0; i < input.length; i ++) {
+            // Vec2 o = input[i];
+            Vec2 o = input[i].mul(scale);
+            // output[i] = new Vec2(((ccomp*o.x)+(scomp*o.y))*scale+translation.x, ((-scomp*o.x)+(ccomp*o.y))*scale+translation.y);
+            output[i] = new Vec2(((ccomp*o.x)+(scomp*o.y))+translation.x, ((-scomp*o.x)+(ccomp*o.y))+translation.y);
+        }
+        return output;
+    }
+    public Vec2 getTranslation() {
         return translation;
     }
-    public void setTranslation(FPoint translation) {
+    public void setTranslation(Vec2 translation) {
         this.translation = translation;
     }
-    public void translate(FPoint translation) {
-        this.translation = new FPoint(this.translation.x + translation.x, this.translation.y + translation.y);
+    public void translate(Vec2 translation) {
+        this.translation = new Vec2(this.translation.x + translation.x, this.translation.y + translation.y);
     }
     public double getRotation() {
         return rotation;
@@ -40,5 +66,8 @@ public class Transform {
     }
     public void rotate(double rotation) {
         this.rotation += rotation;
+    }
+    public void scale(double mult) {
+        scale *= mult;
     }
 }

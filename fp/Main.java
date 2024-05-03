@@ -17,10 +17,13 @@ import fp.events.SEvent;
 import fp.events.StateEvent;
 
 public class Main implements EventListener {
+    private static final int FRAMERATE = 60;
+    private static final int FRAMEDELAY = 1000/FRAMERATE;
     private static int quickCode = StateEvent.getCode();
     public static Collider[] cols = new Collider[3];
     public static Shape[] shps = new Shape[3];
-    private static FPoint right=new FPoint(0.01,0),left=new FPoint(-0.01,0),up=new FPoint(0,0.01),down=new FPoint(0,-0.01);
+    private static Vec2 right=new Vec2(0.01,0),left=new Vec2(-0.01,0),up=new Vec2(0,0.01),down=new Vec2(0,-0.01);
+    private static boolean coltestdo = false;
     public void trigger(Event e) {
         Main.strigger(e);
     }
@@ -28,6 +31,7 @@ public class Main implements EventListener {
         if (e.type.any(EventType.MouseMove, EventType.MouseDrag, EventType.Signal)) return;
         // System.out.println(e.type);
         if (e.type.key()) {
+            if (!coltestdo) return;
             KEvent ke = (KEvent)e;
             int N = 0;
             if (ke.type == EventType.KeyUp) {
@@ -65,7 +69,11 @@ public class Main implements EventListener {
             }
         }
     }
+    public static int toFrames(int time) {
+        return Math.max(1, time / FRAMEDELAY);
+    }
     public static void tick() {
+        new Player();
         new Thread(){
             public void run() {
                 do {
@@ -73,27 +81,27 @@ public class Main implements EventListener {
                     try {
                         sleep(10);
                     } catch (InterruptedException E) {}
-                } while (true);
+                } while (false);
             }
         }.start();
     }
     public static void coltest() {
-        Transform t1 = new Transform(new FPoint(0.5, 0.5), 0.0);
-        Transform t2 = new Transform(new FPoint(0.5, 0.5), 0.0);
-        Transform t3 = new Transform(new FPoint(0.5, 0.5), 0.0);
+        Transform t1 = new Transform(new Vec2(0.5, 0.5), 0.0);
+        Transform t2 = new Transform(new Vec2(0.5, 0.5), 0.0);
+        Transform t3 = new Transform(new Vec2(0.5, 0.5), 0.0);
         Shape s1 = Shape.Rect(0.2, 0.2, t1);
         Shape s2 = Shape.Circle(0.05, t2);
-        FPoint[] tripoints = FPoint.normalize(new FPoint[]{new FPoint(), new FPoint(0.05,0.0), new FPoint(0.025,0.1)});
+        Vec2[] tripoints = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05,0.0), new Vec2(0.025,0.1)});
         Shape s3 = Shape.Poly(tripoints, t3);
-        s1.fill = null;
-        s2.fill = null;
-        s3.fill = null;
-        s1.stroke = StdDraw.BLUE;
-        s2.stroke = StdDraw.GREEN;
-        s3.stroke = StdDraw.RED;
-        s1.strokewidth = 0.002;
-        s2.strokewidth = 0.002;
-        s3.strokewidth = 0.002;
+        s1.fill(null);
+        s2.fill(null);
+        s3.fill(null);
+        s1.stroke(StdDraw.BLUE);
+        s2.stroke(StdDraw.GREEN);
+        s3.stroke(StdDraw.RED);
+        s1.strokewidth(0.002);
+        s2.strokewidth(0.002);
+        s3.strokewidth(0.002);
         DrawManager.add(s1);
         DrawManager.add(s2);
         DrawManager.add(s3);
@@ -106,6 +114,7 @@ public class Main implements EventListener {
         shps[0] = s1;
         shps[1] = s2;
         shps[2] = s3;
+        coltestdo = true;
         Observer.signal(new SEvent(null, SEvent.SIGTICK));
         System.out.println(c1.collides(c2));
         System.out.println(c1.collides(c3));
@@ -123,8 +132,8 @@ public class Main implements EventListener {
         }
         final boolean loop = aloop;
         // new Player();
-        coltest();
         // Observer.signal(new SEvent(null, SEvent.SIGTICK));
         if (loop) tick();
+        else coltest();
     }
 }
