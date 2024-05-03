@@ -133,16 +133,15 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     }
     public void damage(int amount) {
         health -= amount;
-        if (health <= 0) {}
+        if (health <= 0) {
+            destroy();
+        }
     }
     public int getHealth() {
         return health;
     }
     public void setTarget(Entity t) {}
     public Entity getTarget() {return null;}
-    public Vec2 getPosition() {
-        return shape.transform.getTranslation();
-    }
     public void destroy() {
         DrawManager.remove(shape);
     }

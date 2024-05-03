@@ -11,7 +11,6 @@ public interface Entity {
     public int getHealth();
     public void setTarget(Entity t);
     public Entity getTarget();
-    public Vec2 getPosition();
     public void destroy();
     public Shape getShape();
     public Transform transform();

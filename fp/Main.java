@@ -72,6 +72,9 @@ public class Main implements EventListener {
     public static int toFrames(int time) {
         return Math.max(1, time / FRAMEDELAY);
     }
+    public static double toSecs(int frames) {
+        return ((double)frames)/((double)FRAMERATE);
+    }
     public static void tick() {
         new Player();
         new Thread(){

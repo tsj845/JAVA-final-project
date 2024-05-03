@@ -47,4 +47,10 @@ public class CLine {
     public boolean intersects(CLine other) {
         return partialIntersectCalc(this, other) && partialIntersectCalc(other, this);
     }
+    public double degBetween(CLine other) {
+        return other.angle - angle;
+    }
+    public double radBetween(CLine other) {
+        return Math.toRadians(degBetween(other));
+    }
 }
