@@ -1,6 +1,5 @@
 package fp.entities;
 
-import fp.Vec2;
 import fp.drawing.Shape;
 import fp.drawing.Transform;
 

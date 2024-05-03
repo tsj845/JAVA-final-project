@@ -51,6 +51,8 @@ public class Main implements EventListener {
                     return;
                 }
                 Observer.signal(SEvent.TICK);
+                System.out.println("TICK");
+                System.out.println(cols[0].collides(cols[1]));
                 System.out.println(cols[0].collides(cols[2]));
             }
             // System.out.println(((KEvent)e));
@@ -92,7 +94,9 @@ public class Main implements EventListener {
         Transform t1 = new Transform(new Vec2(0.5, 0.5), 0.0);
         Transform t2 = new Transform(new Vec2(0.5, 0.5), 0.0);
         Transform t3 = new Transform(new Vec2(0.5, 0.5), 0.0);
-        Shape s1 = Shape.Rect(0.2, 0.2, t1);
+        // Shape s1 = Shape.Rect(0.2, 0.2, t1);
+        Vec2[] tp2 = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05, 0.0), new Vec2(0.025, 0.1)});
+        Shape s1 = Shape.Poly(tp2, t1);
         Shape s2 = Shape.Circle(0.05, t2);
         Vec2[] tripoints = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05,0.0), new Vec2(0.025,0.1)});
         Shape s3 = Shape.Poly(tripoints, t3);
@@ -108,7 +112,8 @@ public class Main implements EventListener {
         DrawManager.add(s1);
         DrawManager.add(s2);
         DrawManager.add(s3);
-        Collider c1 = Collider.boxCollider(t1, 0.2, 0.2);
+        // Collider c1 = Collider.boxCollider(t1, 0.2, 0.2);
+        Collider c1 = Collider.triangleCollider(t1, tp2[0], tp2[1], tp2[2]);
         Collider c2 = Collider.circleCollider(t2, 0.05);
         Collider c3 = Collider.triangleCollider(t3, tripoints[0], tripoints[1], tripoints[2]);
         cols[0] = c1;
