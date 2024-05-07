@@ -1,0 +1,101 @@
+#-[directive]
+where [directive] is
+[[ use, colors, objs, end, scope ]]
+[[use]] - parse the file specified by "#-use,[file]"
+[[colors]] - color defs section
+[[objs]] - object defs section
+[[scope]] - named scope section with "#-scope,[name]"
+[[end]] - end section
+
+commands
+
+I[#]
+where # is
+[ integer & >= 0 ]
+starts a new object
+
+M[x],[y]
+where [x] and [y] are
+[ real ]
+moves pen to point ([x],[y])
+
+C[color]
+where [color] is
+[ NAME, [R,G,B], [null]]
+[NAME] - name of color from a color defs section
+[R,G,B] - red, green, blue components
+[[null]] - no color
+sets fill to [color]
+
+S[color]
+sets stroke to [color]
+
+R[r]
+where [r] is
+[ real > 0 ]
+draws a circle with radius [r]
+
+B[w],[h]
+where [w] and [h] are
+[ real > 0 ]
+draws a centered box with width [w] and height [h]
+
+P[points]
+where [points] is
+[[ [x1],[y1] ; {...} [xn],[yn] ]]
+draws a polygon with specified points
+
+O[rotation]
+where [rotation] is
+[ real ]
+sets the rotation to [rotation]
+
+W[w]
+where [w] is
+[ real >= 0 ]
+sets stroke width to [w]
+
+E
+ends the object
+
+U[#]
+where [#] is the number of a previously defined object
+adds the specified object using relative coordinates
+
+L
+pushes the current style onto the stack
+
+K
+pops a style off of the stack
+
+F ||
+F[N]{[params]}
+where [N] is
+[[ NAME ]]
+where [params] is
+[[ NAME [ , ... | ?[##] ] ]]
+if "...,?,..." is used, all parameters following the "?"
+become optional, "?" becomes "?0"
+the [##] is used to check for which optional groups have been provided
+defines a parameterized template
+
+J[N]{[params]}
+where [params] is
+[[ NAME=VALUE [, ...] ]]
+uses a parameterized template
+
+A[SUB]
+assertions
+where [SUB] is
+[[ PX, ... ]]
+[[PX]] - assert that at most one of the given optional groups was provided
+
+Q[SUB]
+queries/conditionals
+where [SUB] is
+[[ QE, QP, QNP, ... ]]
+[[QE]] - end conditional
+[[QP]] - optional group provided
+[[QNP]] - optional group not provided
+
+when a command ID is lowercase, the coordinates become local, if applicable

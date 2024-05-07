@@ -29,7 +29,7 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     private double rotspeed = 2.5;
     private Vec2 left=new Vec2(-Player.PSPEED,0).div(Player.SSCALE),right=new Vec2(Player.PSPEED,0).div(Player.SSCALE),up=new Vec2(0,Player.PSPEED).div(Player.SSCALE),down=new Vec2(0,-Player.PSPEED).div(Player.SSCALE);
     public Player() {
-        super();
+        super(new KinParams(1, 1, 0.05));
         // ShapeBuilder sb = new ShapeBuilder();
         // sb.push(new FPoint(0, 0));
         // sb.push(new FPoint(0.01, 0));
@@ -51,7 +51,6 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     public void trigger(Event e) {
         if (e.type.signal() && ((SEvent)e).sigcode == SEvent.SIGTICK) {
             this.update();
-            this.draw();
         } else if (e.type.key()) {
             KEvent ke = (KEvent)e;
             if (ke.type == EventType.KeyPress) return;
@@ -118,18 +117,6 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
         if (inputbuf[3]) {t.translate(down);inputbuf[3]=held[3];}
         if (inputbuf[5]) {t.rotate(-rotspeed);inputbuf[5]=held[5];}
         if (inputbuf[6]) {t.rotate(rotspeed);inputbuf[6]=held[6];}
-        if (Vec2.minX(t.apply(shape.points)) > 1) {
-            t.translate(new Vec2(-1,0));
-        }
-        if (Vec2.maxX(t.apply(shape.points)) < 0) {
-            t.translate(new Vec2(1, 0));
-        }
-        if (Vec2.minY(t.apply(shape.points)) > 1) {
-            t.translate(new Vec2(0, -1));
-        }
-        if (Vec2.maxY(t.apply(shape.points)) < 0) {
-            t.translate(new Vec2(0, 1));
-        }
     }
     public void damage(int amount) {
         health -= amount;
@@ -143,7 +130,7 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     public void setTarget(Entity t) {}
     public Entity getTarget() {return null;}
     public void destroy() {
-        DrawManager.remove(shape);
+        Observer.signal(Main.OVER);
     }
     public Shape getShape() {
         return shape;

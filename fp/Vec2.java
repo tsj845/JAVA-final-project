@@ -36,20 +36,20 @@ public class Vec2 {
         for (int i = 0; i < in.length; i ++) {
             out[i] = in[i].sub(c);
         }
-        if (dbgNormal > 0) {
-            System.out.println(Arrays.toString(in));
-            System.out.println(Arrays.toString(out));
-            double[] angs = new double[in.length];
-            for (int i = 0; i < in.length; i ++) {
-                angs[i] = in[i].degAngle(in[(i+1)%in.length]);
-            }
-            System.out.println(Arrays.toString(angs));
-            for (int i = 0; i < in.length; i ++) {
-                angs[i] = out[i].degAngle(out[(i+1)%in.length]);
-            }
-            System.out.println(Arrays.toString(angs));
-            dbgNormal --;
-        }
+        // if (dbgNormal > 0) {
+        //     System.out.println(Arrays.toString(in));
+        //     System.out.println(Arrays.toString(out));
+        //     double[] angs = new double[in.length];
+        //     for (int i = 0; i < in.length; i ++) {
+        //         angs[i] = in[i].degAngle(in[(i+1)%in.length]);
+        //     }
+        //     System.out.println(Arrays.toString(angs));
+        //     for (int i = 0; i < in.length; i ++) {
+        //         angs[i] = out[i].degAngle(out[(i+1)%in.length]);
+        //     }
+        //     System.out.println(Arrays.toString(angs));
+        //     dbgNormal --;
+        // }
         return out;
     }
     public static double minX(Vec2[] points) {
@@ -91,7 +91,8 @@ public class Vec2 {
         return Math.sqrt(x*x+y*y);
     }
     public Vec2 norm() {
-        return div(mag());
+        double ma = mag();
+        return ma > 0.0d ? div(ma) : new Vec2();
     }
     public double sqDist(Vec2 other) {
         Vec2 i = sub(other);
@@ -101,7 +102,7 @@ public class Vec2 {
         Vec2 d = other.sub(this);
         double r = Math.atan2(d.y, d.x);
         // double r = Math.acos(d.x/d.mag());
-        System.out.printf("%s : %f,\n", d, r);
+        // System.out.printf("%s : %f,\n", d, r);
         // double r = Math.acos(dot(other)/(mag()*other.mag()));
         return (Double.isNaN(r) ? 0.0d : r);
     }

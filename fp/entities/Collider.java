@@ -191,7 +191,6 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
     private static boolean cCircCirc(Collider c1, Collider c2) {
         return c1.transform.getTranslation().sqDist(c2.transform.getTranslation()) <= (c1.data[1]+c2.data[1]);
     }
-    // TODO
     private static boolean cCircTri(Collider c1, Collider c2) {
         Vec2 c = c1.transform.getTranslation();
         double r2 = c1.data[1];

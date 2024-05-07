@@ -24,6 +24,14 @@ public class Main implements EventListener {
     public static Shape[] shps = new Shape[3];
     private static Vec2 right=new Vec2(0.01,0),left=new Vec2(-0.01,0),up=new Vec2(0,0.01),down=new Vec2(0,-0.01);
     private static boolean coltestdo = false;
+    public static volatile boolean gamerun = true;
+    public static final int GAMEOBJS = StateEvent.getCode();
+    public static final int SIGOVER;
+    public static final SEvent OVER;
+    static {
+        SIGOVER = SEvent.registerSignal("SIGOVER");
+        OVER = new SEvent(null, SIGOVER);
+    }
     public void trigger(Event e) {
         Main.strigger(e);
     }
@@ -31,8 +39,13 @@ public class Main implements EventListener {
         if (e.type.any(EventType.MouseMove, EventType.MouseDrag, EventType.Signal)) return;
         // System.out.println(e.type);
         if (e.type.key()) {
-            if (!coltestdo) return;
             KEvent ke = (KEvent)e;
+            if (ke.type == EventType.KeyUp) {
+                if (ke.code == KeyEvent.VK_P) {
+                    gamerun = false;
+                }
+            }
+            if (!coltestdo) return;
             int N = 0;
             if (ke.type == EventType.KeyUp) {
                 if (ke.code == KeyEvent.VK_RIGHT) {
@@ -78,17 +91,19 @@ public class Main implements EventListener {
         return ((double)frames)/((double)FRAMERATE);
     }
     public static void tick() {
-        new Player();
-        new Thread(){
-            public void run() {
-                do {
-                    Observer.signal(new SEvent(null, SEvent.SIGTICK));
-                    try {
-                        sleep(10);
-                    } catch (InterruptedException E) {}
-                } while (false);
-            }
-        }.start();
+        // new Player();
+        // new Thread(){
+        //     public void run() {
+        //         do {
+        //             Observer.signal(new SEvent(null, SEvent.SIGTICK));
+        //             try {
+        //                 sleep(10);
+        //             } catch (InterruptedException E) {}
+        //         } while (Main.gamerun);
+        //         System.exit(0);
+        //     }
+        // }.start();
+        Game.start();
     }
     public static void coltest() {
         Transform t1 = new Transform(new Vec2(0.5, 0.5), 0.0);

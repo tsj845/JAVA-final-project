@@ -1,0 +1,17 @@
+#-use,all.txt
+#-scope,astsmall
+#-objs
+I0
+M0,0
+CGRAY
+SBORD
+W.002
+R.05
+Jtemplate.CRATER{RADIUS=.0125,?00,X=.025,Y=0}
+/CDIM
+/SBORD
+/M.025,0
+/R.0125
+E
+#-end
+#-end

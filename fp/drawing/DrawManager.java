@@ -30,7 +30,7 @@ public class DrawManager implements EventListener {
     public void trigger(Event e) {
         if (e.type.signal()) {
             SEvent se = (SEvent)e;
-            if (se.sigcode == SEvent.SIGTICK) {
+            if (se.sigcode == SEvent.SIGDRAW) {
                 DrawManager.draw();
             }
         }

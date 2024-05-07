@@ -59,6 +59,21 @@ public abstract class Kinematic {
         realImpulseRaw(application, force.mul(dt));
     }
     public void update() {
-        shape.transform.translate(velocity);
+        Transform t = shape.transform;
+        t.translate(velocity);
+        Vec2 vd = velocity.sub(velocity.norm().mul(-params.friction()));
+        velocity = (vd.norm() == velocity.norm() || (vd.x==0.0d&&vd.y==0.0d)) ? vd : new Vec2();
+        if (shape.minX() > 1.05) {
+            t.translate(new Vec2(-1,0));
+        }
+        if (shape.maxX() < -0.05) {
+            t.translate(new Vec2(1, 0));
+        }
+        if (shape.minY() > 1.05) {
+            t.translate(new Vec2(0, -1));
+        }
+        if (shape.maxY() < -0.05) {
+            t.translate(new Vec2(0, 1));
+        }
     }
 }

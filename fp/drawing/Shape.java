@@ -96,8 +96,60 @@ public class Shape implements Drawable {
         if (shapes == null) throw new IllegalArgumentException();
         return shapes.removeLast();
     }
+    public double minX() {
+        if (type == ShapeType.Group) {
+            double min = Double.POSITIVE_INFINITY;
+            for (Shape s : shapes) {
+                min = Math.min(min, s.minX());
+            }
+            return min;
+        }
+        if (type == ShapeType.Circ) {
+            return transform.getTranslation().x - points[0].y;
+        }
+        return Vec2.minX(transform.apply(points));
+    }
+    public double maxX() {
+        if (type == ShapeType.Group) {
+            double max = Double.NEGATIVE_INFINITY;
+            for (Shape s : shapes) {
+                max = Math.min(max, s.maxX());
+            }
+            return max;
+        }
+        if (type == ShapeType.Circ) {
+            return transform.getTranslation().x + points[0].y;
+        }
+        return Vec2.maxX(transform.apply(points));
+    }
+    public double minY() {
+        if (type == ShapeType.Group) {
+            double min = Double.POSITIVE_INFINITY;
+            for (Shape s : shapes) {
+                min = Math.min(min, s.minY());
+            }
+            return min;
+        }
+        if (type == ShapeType.Circ) {
+            return transform.getTranslation().y - points[0].y;
+        }
+        return Vec2.minY(transform.apply(points));
+    }
+    public double maxY() {
+        if (type == ShapeType.Group) {
+            double max = Double.NEGATIVE_INFINITY;
+            for (Shape s : shapes) {
+                max = Math.min(max, s.maxY());
+            }
+            return max;
+        }
+        if (type == ShapeType.Circ) {
+            return transform.getTranslation().y + points[0].y;
+        }
+        return Vec2.maxY(transform.apply(points));
+    }
     public void draw() {
-        if (points == null) {
+        if (type == ShapeType.Group) {
             for (Shape s : shapes) {
                 s.draw();
             }
@@ -108,10 +160,10 @@ public class Shape implements Drawable {
             case Poly:
                 double[] x = new double[points.length], y = new double[points.length];
                 int i = 0;
-                // for (Vec2 p : transform.apply(points)) {
-                for (Vec2 p : points) {
-                    x[i] = p.x+0.5;
-                    y[i++] = p.y+0.5;
+                for (Vec2 p : transform.apply(points)) {
+                // for (Vec2 p : points) {
+                    x[i] = p.x;
+                    y[i++] = p.y;
                 }
                 // if (stroke != null) {
                 //     double rad = roundness*strokewidth;
@@ -139,14 +191,16 @@ public class Shape implements Drawable {
                 }
                 break;
             case Circ:
-                StdDraw.setPenRadius(strokewidth);
+                Vec2 c = transform.apply(new Vec2[]{new Vec2()})[0];
+                if (stroke != null) {
+                    StdDraw.setPenRadius(strokewidth);
+                    StdDraw.setPenColor(stroke);
+                    StdDraw.circle(c.x, c.y, points[0].y);
+                }
+                StdDraw.setPenRadius(0.0d);
                 if (fill != null) {
                     StdDraw.setPenColor(fill);
-                    StdDraw.filledCircle(transform.getTranslation().x, transform.getTranslation().y, points[0].y);
-                }
-                if (stroke != null) {
-                    StdDraw.setPenColor(stroke);
-                    StdDraw.circle(transform.getTranslation().x, transform.getTranslation().y, points[0].y);
+                    StdDraw.filledCircle(c.x, c.y, points[0].y);
                 }
                 break;
             default:
