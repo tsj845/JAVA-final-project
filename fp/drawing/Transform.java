@@ -105,4 +105,7 @@ public class Transform {
     public void scale(double mult) {
         scale *= mult;
     }
+    public String toString() {
+        return String.format("x=%f,y=%f,a=%f,s=%f", translation.x, translation.y, rotation, scale);
+    }
 }

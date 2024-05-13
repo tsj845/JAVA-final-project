@@ -6,6 +6,7 @@ import fp.drawing.DrawManager;
 import fp.drawing.Shape;
 import fp.drawing.ShapeBuilder;
 import fp.drawing.Transform;
+import fp.entities.Asteroid;
 import fp.entities.Collider;
 import fp.entities.Player;
 import fp.events.Event;
@@ -28,10 +29,16 @@ public class Main implements EventListener {
     public static final int GAMEOBJS = StateEvent.getCode();
     public static final int SIGOVER;
     public static final SEvent OVER;
+    public static final int SIGRELD;
+    public static final SEvent RELD;
     static {
         SIGOVER = SEvent.registerSignal("SIGOVER");
         OVER = new SEvent(null, SIGOVER);
+        SIGRELD = SEvent.registerSignal("SIGRELD");
+        RELD = new SEvent(null, SIGRELD);
     }
+    public static ShapeBuilder assetBuilder = new ShapeBuilder("fp/res/entry.txt");
+    private static boolean atest = false;
     public void trigger(Event e) {
         Main.strigger(e);
     }
@@ -40,9 +47,21 @@ public class Main implements EventListener {
         // System.out.println(e.type);
         if (e.type.key()) {
             KEvent ke = (KEvent)e;
+            if (atest) {
+                if (ke.type == EventType.KeyUp) {
+                    if (ke.code == KeyEvent.VK_R) {
+                        assetBuilder = new ShapeBuilder("fp/res/entry.txt");
+                        Observer.signal(RELD);
+                        Observer.signal(SEvent.DRAW);
+                    }
+                }
+            }
             if (ke.type == EventType.KeyUp) {
                 if (ke.code == KeyEvent.VK_P) {
                     gamerun = false;
+                }
+                if (ke.code == KeyEvent.VK_O) {
+                    System.exit(0);
                 }
             }
             if (!coltestdo) return;
@@ -147,15 +166,32 @@ public class Main implements EventListener {
         Main m = new Main();
         Observer.register(m);
         boolean aloop = true;
+        boolean qimm = false;
         for (String arg : args) {
             if (arg.equalsIgnoreCase("noloop")) {
                 aloop = false;
-                break;
+            }
+            if (arg.equalsIgnoreCase("null")) {
+                qimm = true;
+            }
+            if (arg.equalsIgnoreCase("atest")) {
+                atest = true;
             }
         }
+        // System.out.println(String.join(",\n", assetBuilder.getMetas("").toString().split(", ")));
+        System.out.println(String.join(",\n", assetBuilder.getMetas("<astsmall>").toString().split(", ")));
+        assetBuilder.debug();
         final boolean loop = aloop;
         // new Player();
         // Observer.signal(new SEvent(null, SEvent.SIGTICK));
+        if (qimm) System.exit(0);
+        if (atest) {
+            new Asteroid(1, 0.25, 0.5);
+            new Asteroid(2, 0.5, 0.5);
+            new Asteroid(3, 0.75, 0.5);
+            Observer.signal(SEvent.DRAW);
+            return;
+        }
         if (loop) tick();
         else coltest();
     }

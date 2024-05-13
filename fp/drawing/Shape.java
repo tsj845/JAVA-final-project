@@ -1,6 +1,7 @@
 package fp.drawing;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import fp.Vec2;
@@ -206,6 +207,25 @@ public class Shape implements Drawable {
             default:
                 throw new IllegalArgumentException();
         }
+    }
+    private String getA(Color c) {
+        if (c == null) return "\u001b[0m";
+        return String.format("\u001b[38;2;%d;%d;%dm", c.getRed(), c.getGreen(), c.getBlue());
+    }
+    public String toString() {
+        if (type == ShapeType.Group) {
+            return String.format("%sGRP%s{%s}%s::%s", getA(fill), getA(stroke), transform.toString(), getA(null), shapes.toString());
+        }
+        if (type == ShapeType.Circ) {
+            return String.format("%sCIRC%s{%s,r=%f}%s", getA(fill), getA(stroke), transform.toString(), points[0].y, getA(null));
+        }
+        if (type == ShapeType.Rect) {
+            return String.format("%sRECT%s{%s,w=%f,h=%f}%s", getA(fill), getA(stroke), transform.toString(), Vec2.maxX(points)-Vec2.minX(points), Vec2.maxY(points)-Vec2.minY(points), getA(null));
+        }
+        if (type == ShapeType.Poly) {
+            return String.format("%sPOLY%s{%s}%s::%s", getA(fill), getA(stroke), transform.toString(), getA(null), Arrays.toString(points));
+        }
+        throw new IllegalArgumentException();
     }
     // accessors
     public Color fill() {return fill;}

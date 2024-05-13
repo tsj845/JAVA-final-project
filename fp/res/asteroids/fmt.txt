@@ -42,8 +42,11 @@ draws a centered box with width [w] and height [h]
 
 P[points]
 where [points] is
-[[ [x1],[y1] ; {...} [xn],[yn] ]]
+[[ [[ g | G ]][x1],[y1] ; {...} [xn],[yn] ]]
 draws a polygon with specified points
+when 'g' uses relative, else absolute
+a new 'g' or 'G' is required with every new line used
+closed with 'V' or 'v'
 
 O[rotation]
 where [rotation] is
@@ -93,9 +96,9 @@ where [SUB] is
 Q[SUB]
 queries/conditionals
 where [SUB] is
-[[ QE, QP, QNP, ... ]]
-[[QE]] - end conditional
-[[QP]] - optional group provided
-[[QNP]] - optional group not provided
+[[ E, P, NP, ... ]]
+[[E]] - end conditional
+[[P]] - optional group provided
+[[NP]] - optional group not provided
 
 when a command ID is lowercase, the coordinates become local, if applicable

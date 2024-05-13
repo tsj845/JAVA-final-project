@@ -1,0 +1,15 @@
+#-use,all.txt
+#-scope,astmedium
+#-meta
+points:+2
+split:+2
+#-end
+#-objs
+I0
+M0,0
+Utemplate.STYLE
+R.075
+Jtemplate.CRATER{RADIUS=.025,?00,X=.0125,Y=0}
+E
+#-end
+#-end

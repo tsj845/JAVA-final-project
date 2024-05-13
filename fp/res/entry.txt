@@ -1,0 +1,1 @@
+#-use,asteroids/$$[small,medium,large]$$.txt

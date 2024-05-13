@@ -48,9 +48,15 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
         health = 100;
         Observer.register(this);
     }
+    public void reload() {}
     public void trigger(Event e) {
-        if (e.type.signal() && ((SEvent)e).sigcode == SEvent.SIGTICK) {
-            this.update();
+        if (e.type.signal()) {
+            SEvent se = (SEvent)e;
+            if (se.sigcode == SEvent.SIGTICK) {
+                this.update();
+            } else if (se.sigcode == Main.SIGRELD) {
+                reload();
+            }
         } else if (e.type.key()) {
             KEvent ke = (KEvent)e;
             if (ke.type == EventType.KeyPress) return;

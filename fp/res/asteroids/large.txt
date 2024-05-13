@@ -1,0 +1,13 @@
+#-use.all.txt
+#-scope,astlarge
+#-meta
+points:+3
+split:+2
+#-end
+#-objs
+I0
+Utemplate.STYLE
+R.1
+E
+#-end
+#-end

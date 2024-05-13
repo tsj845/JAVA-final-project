@@ -13,4 +13,5 @@ public interface Entity {
     public void destroy();
     public Shape getShape();
     public Transform transform();
+    public void reload();
 }

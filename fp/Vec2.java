@@ -1,7 +1,5 @@
 package fp;
 
-import java.util.Arrays;
-
 public class Vec2 {
     public static final double EPSILON = Math.ulp(1.0d);
     public final double x, y;
@@ -36,20 +34,6 @@ public class Vec2 {
         for (int i = 0; i < in.length; i ++) {
             out[i] = in[i].sub(c);
         }
-        // if (dbgNormal > 0) {
-        //     System.out.println(Arrays.toString(in));
-        //     System.out.println(Arrays.toString(out));
-        //     double[] angs = new double[in.length];
-        //     for (int i = 0; i < in.length; i ++) {
-        //         angs[i] = in[i].degAngle(in[(i+1)%in.length]);
-        //     }
-        //     System.out.println(Arrays.toString(angs));
-        //     for (int i = 0; i < in.length; i ++) {
-        //         angs[i] = out[i].degAngle(out[(i+1)%in.length]);
-        //     }
-        //     System.out.println(Arrays.toString(angs));
-        //     dbgNormal --;
-        // }
         return out;
     }
     public static double minX(Vec2[] points) {
@@ -101,9 +85,6 @@ public class Vec2 {
     public double radAngle(Vec2 other) {
         Vec2 d = other.sub(this);
         double r = Math.atan2(d.y, d.x);
-        // double r = Math.acos(d.x/d.mag());
-        // System.out.printf("%s : %f,\n", d, r);
-        // double r = Math.acos(dot(other)/(mag()*other.mag()));
         return (Double.isNaN(r) ? 0.0d : r);
     }
     public double degAngle(Vec2 other) {

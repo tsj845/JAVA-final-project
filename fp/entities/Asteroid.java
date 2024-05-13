@@ -10,23 +10,35 @@ import fp.drawing.Shape;
 import fp.drawing.Transform;
 import fp.events.Event;
 import fp.events.EventListener;
+import fp.events.SEvent;
 import fp.events.StateEvent;
 
 public class Asteroid extends Kinematic implements Entity, EventListener, Drawable {
     private int health;
+    private int size;
     private Entity targetEnt;
     private static Shape generate(int size) {
-        size /= 100;
-        Shape main = Shape.Group();
-        Shape working;
-        working = Shape.Circle(size, new Transform(main.transform));
-        working.fill(StdDraw.GRAY);
-        main.addShape(working);
-        return main;
+        return generate(size, new Transform());
+    }
+    private static Shape generate(int size, Transform t) {
+        if (size == 100) {
+            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<astsmall>::names"), t);
+        } else if (size == 200) {
+            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<astmedium>::names"), t);
+        } else if (size == 300) {
+            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<astlarge>::names"), t);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+    public void reload() {
+        // System.out.println("RELOAD");
+        shape = Asteroid.generate(size*100, shape.transform);
     }
     public Asteroid() {
         super(new KinParams());
-        health = (((int)(Math.random()*3.0d))+1)*100;
+        size = (((int)(Math.random()*3.0d))+1);
+        health = size*100;
         shape = Asteroid.generate(health);
         // shape = Shape.Circle(((double)health) / 1000.0d);
         // shape.fill(StdDraw.CYAN);
@@ -37,8 +49,27 @@ public class Asteroid extends Kinematic implements Entity, EventListener, Drawab
         y = (Math.random()*0.2+0.05)*sy + ((sy-1)/2)*-1;
         shape.transform.setTranslation(new Vec2(x, y));
         DrawManager.add(this);
+        Observer.register(this);
+        System.out.println(shape);
     }
-    public void trigger(Event e) {}
+    public Asteroid(int size, double x, double y) {
+        super(new KinParams());
+        this.size = size;
+        health = size*100;
+        shape = Asteroid.generate(size*100);
+        shape.transform.setTranslation(new Vec2(x, y));
+        DrawManager.add(this);
+        Observer.register(this);
+        System.out.println(shape);
+    }
+    public void trigger(Event e) {
+        if (e.type.signal()) {
+            SEvent se = (SEvent)e;
+            if (se.sigcode == Main.SIGRELD) {
+                reload();
+            }
+        }
+    }
     public void draw() {
         shape.draw();
     }
