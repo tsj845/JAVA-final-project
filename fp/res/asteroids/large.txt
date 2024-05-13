@@ -1,13 +1,15 @@
 #-use.all.txt
-#-scope,astlarge
+#-scope,ast
+#-scope,large
 #-meta
 points:+3
 split:+2
 #-end
 #-objs
 I0
-Utemplate.STYLE
+Uast.template.STYLE
 R.1
 E
+#-end
 #-end
 #-end

@@ -1,5 +1,6 @@
 #-use,all.txt
-#-scope,astmedium
+#-scope,ast
+#-scope,medium
 #-meta
 points:+2
 split:+2
@@ -7,9 +8,10 @@ split:+2
 #-objs
 I0
 M0,0
-Utemplate.STYLE
+Uast.template.STYLE
 R.075
-Jtemplate.CRATER{RADIUS=.025,?00,X=.0125,Y=0}
+Jast.template.CRATER{RADIUS=.025,?00,X=.0125,Y=0}
 E
+#-end
 #-end
 #-end

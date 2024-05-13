@@ -15,7 +15,7 @@ public class DrawManager implements EventListener {
     private DrawManager() {
     }
     private static void draw() {
-        StdDraw.clear();
+        StdDraw.clear(StdDraw.BLACK);
         for (Drawable s : stack) {
             s.draw();
         }

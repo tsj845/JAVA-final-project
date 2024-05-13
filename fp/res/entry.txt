@@ -1,1 +1,2 @@
 #-use,asteroids/$$[small,medium,large]$$.txt
+#-use,player.txt

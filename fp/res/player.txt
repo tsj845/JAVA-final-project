@@ -1,0 +1,15 @@
+#-use,common/colors.txt
+#-scope,player
+#-objs
+IPLAYER
+/C200,200,200
+Ccommon.WHITE
+Scommon.BORD
+W.01
+P
+/new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.0875,0), new Vec2(0.05,0.0875)
+G.0125,0;.05,.025;.0875,0;.05,.0875
+V
+E
+#-end
+#-end

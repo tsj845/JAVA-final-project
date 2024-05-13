@@ -1,21 +1,10 @@
 package fp.entities;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 
-import fp.Vec2;
-import fp.Main;
-import fp.Observer;
-import fp.StdDraw;
-import fp.drawing.DrawManager;
-import fp.drawing.Drawable;
-import fp.drawing.Shape;
-import fp.drawing.Transform;
-import fp.events.Event;
-import fp.events.EventListener;
-import fp.events.EventType;
-import fp.events.KEvent;
-import fp.events.SEvent;
+import fp.*;
+import fp.drawing.*;
+import fp.events.*;
 
 public class Player extends Kinematic implements Entity, EventListener, Drawable {
     private static final int FCOOLDOWN = Main.toFrames(5);
@@ -36,19 +25,23 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
         // sb.push(new FPoint(0.01, 0.01));
         // sb.push(new FPoint(0, 0.01));
         // shape = sb.toShape();
-        shape = Shape.Poly(new Vec2[]{new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.0875,0), new Vec2(0.05,0.0875)});
+        shape = Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<player>::names", 0));
+        // shape = Shape.Poly(new Vec2[]{new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.0875,0), new Vec2(0.05,0.0875)});
         // shape = Shape.Poly(new Vec2[]{new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.05,0.0875)});
         // shape = Shape.Rect(0.1, 0.1);
         // shape.fill(new Color(0, 255, 0));
-        shape.fill(StdDraw.GRAY);
-        shape.stroke(StdDraw.BLACK);
-        shape.strokewidth(0.01);
-        shape.transform.setTranslation(new Vec2(0.5, 0.5));
+        // shape.fill(StdDraw.GRAY);
+        // shape.stroke(StdDraw.BLACK);
+        // shape.strokewidth(0.01);
+        shape.transform.setTranslation(new Vec2(0.5, 0.65));
+        System.out.println(shape);
         DrawManager.add(this);
         health = 100;
         Observer.register(this);
     }
-    public void reload() {}
+    public void reload() {
+        shape = Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<player>::names", 0), shape.transform);
+    }
     public void trigger(Event e) {
         if (e.type.signal()) {
             SEvent se = (SEvent)e;
@@ -98,12 +91,12 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     }
     public void draw() {
         shape.draw();
-        Transform t = shape.transform;
-        Vec2 f = t.getTranslation();
-        Vec2[] tl = t.apply(shape.points);
-        StdDraw.textLeft(0, 0.25, String.format("X=%f, Y=%f", f.x, f.y));
-        StdDraw.textLeft(0, 0.35, String.format("<X=%f, <Y=%f", Vec2.minX(tl), Vec2.minY(tl)));
-        StdDraw.textLeft(0, 0.45, String.format(">X=%f, >Y=%f", Vec2.maxX(tl), Vec2.maxY(tl)));
+        // Transform t = shape.transform;
+        // Vec2 f = t.getTranslation();
+        // Vec2[] tl = t.apply(shape.points);
+        // StdDraw.textLeft(0, 0.25, String.format("X=%f, Y=%f", f.x, f.y));
+        // StdDraw.textLeft(0, 0.35, String.format("<X=%f, <Y=%f", Vec2.minX(tl), Vec2.minY(tl)));
+        // StdDraw.textLeft(0, 0.45, String.format(">X=%f, >Y=%f", Vec2.maxX(tl), Vec2.maxY(tl)));
     }
     private void fire() {}
     public void update() {

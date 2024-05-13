@@ -189,6 +189,7 @@ public class Main implements EventListener {
             new Asteroid(1, 0.25, 0.5);
             new Asteroid(2, 0.5, 0.5);
             new Asteroid(3, 0.75, 0.5);
+            new Player();
             Observer.signal(SEvent.DRAW);
             return;
         }

@@ -1,17 +1,8 @@
 package fp.entities;
 
-import fp.Main;
-import fp.Observer;
-import fp.StdDraw;
-import fp.Vec2;
-import fp.drawing.DrawManager;
-import fp.drawing.Drawable;
-import fp.drawing.Shape;
-import fp.drawing.Transform;
-import fp.events.Event;
-import fp.events.EventListener;
-import fp.events.SEvent;
-import fp.events.StateEvent;
+import fp.*;
+import fp.drawing.*;
+import fp.events.*;
 
 public class Asteroid extends Kinematic implements Entity, EventListener, Drawable {
     private int health;
@@ -22,11 +13,11 @@ public class Asteroid extends Kinematic implements Entity, EventListener, Drawab
     }
     private static Shape generate(int size, Transform t) {
         if (size == 100) {
-            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<astsmall>::names"), t);
+            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<ast.small>::names"), t);
         } else if (size == 200) {
-            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<astmedium>::names"), t);
+            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<ast.medium>::names"), t);
         } else if (size == 300) {
-            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<astlarge>::names"), t);
+            return Main.assetBuilder.execute((String)Main.assetBuilder.selectMeta("<ast.large>::names"), t);
         } else {
             throw new IllegalArgumentException();
         }
@@ -50,7 +41,6 @@ public class Asteroid extends Kinematic implements Entity, EventListener, Drawab
         shape.transform.setTranslation(new Vec2(x, y));
         DrawManager.add(this);
         Observer.register(this);
-        System.out.println(shape);
     }
     public Asteroid(int size, double x, double y) {
         super(new KinParams());
@@ -60,7 +50,6 @@ public class Asteroid extends Kinematic implements Entity, EventListener, Drawab
         shape.transform.setTranslation(new Vec2(x, y));
         DrawManager.add(this);
         Observer.register(this);
-        System.out.println(shape);
     }
     public void trigger(Event e) {
         if (e.type.signal()) {

@@ -4,13 +4,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -71,15 +65,9 @@ public class ShapeBuilder {
             return String.format("{%s} %s", provided, params.entrySet());
         }
     }
-    private class MetaReq {
-        String mkey;
-        Object mval;
-        boolean mlit;
-        int[] frees = null;
-        MetaReq(String k, Object v, boolean l) {mkey=k;mval=v;mlit=l;}
-    }
+    // prevent processing the same file multiple times
     private HashSet<String> reads = new HashSet<>();
-    private LinkedList<Vec2> points = new LinkedList<>();
+    // meta data
     private HashMap<String, Object> metas = new HashMap<>();
     private HashMap<String, Color> colors = new HashMap<>();
     private HashMap<String, Instruction[]> defs = new HashMap<>();
@@ -122,20 +110,6 @@ public class ShapeBuilder {
         }
         throw new IllegalArgumentException("BAD COMPLEX CODE");
     }
-    private MetaReq parseM(String mkey, String mval) {
-        if (mval.charAt(0) == '~') {
-        } else {
-            if (mval.matches("^([\\-+]?(((0[dD])?[0-9]+)|(0[xX][a-fA-F0-9]+)|(0[oO][0-7]+)|(0[bB][01]+))$")) {
-                int rad = mval.matches("(x|X)") ? 16 : (mval.matches("(o|O)") ? 8 : (mval.matches("(b|B)") ? 2 : 10));
-                return new MetaReq(mkey, Integer.parseInt(mval, rad), true);
-            } else if (mval.equalsIgnoreCase("true") || mval.equalsIgnoreCase("false")) {
-                return new MetaReq(mkey, Boolean.parseBoolean(mval), true);
-            } else {
-                return new MetaReq(mkey, mval, true);
-            }
-        }
-        return null;
-    }
     private Object parseMV(String mv) {
         if (mv.matches("^[\\-+]?([0-9]|0[bdoxBDOX]).*$")) {
             mv = mv.toLowerCase();
@@ -175,13 +149,18 @@ public class ShapeBuilder {
         Object[] lst = (Object[])getMeta(key);
         return lst[(int)(Math.random()*lst.length)];
     }
+    public Object selectMeta(String key, int index) {
+        return ((Object[])getMeta(key))[index];
+    }
+    /*
+     * parses the content of asset files
+     */
     private void parse(String[] lines) {
         LinkedList<Integer> statestack = new LinkedList<>();
         LinkedList<String> scopestack = new LinkedList<>();
         int state = 0;
         String cname = "";
         ArrayList<Instruction> is = new ArrayList<>();
-        LinkedList<MetaReq> metareqs = new LinkedList<>();
         LinkedList<LinkedList<String>> nkeys = new LinkedList<>();
         LinkedList<Integer> countstack = new LinkedList<>();
         String fname = null;
@@ -200,7 +179,6 @@ public class ShapeBuilder {
                 } else if (line.equalsIgnoreCase("end")) {
                     if (state == 0) {
                         metas.put(fmtScope(fname, scopestack)+"count", countstack.pop());
-                        // metas.put(fmtScope(fname, scopestack)+"names", "["+String.join(",", nkeys.removeLast())+"]");
                         metas.put(fmtScope(fname, scopestack)+"names", nkeys.removeLast().toArray(String[]::new));
                         scopestack.removeLast();
                     } else {
@@ -234,8 +212,10 @@ public class ShapeBuilder {
                 case 1:
                     String[] parts = line.split(",");
                     String csv = fmtScope(fname, scopestack);
+                    // System.out.println(csv);
                     csv = csv.substring(csv.indexOf('<')+1, csv.indexOf('>'));
-                    colors.put((csv.length()>0?".":"")+parts[0], getColor(parts, 1));
+                    // System.out.println(csv);
+                    colors.put(csv+(csv.length()>0?".":"")+parts[0], getColor(parts, 1));
                     break;
                 case 2:
                     char cmd = line.charAt(0);
@@ -269,9 +249,6 @@ public class ShapeBuilder {
                     }
                     break;
                 case 5:
-                    // metareqs.add(parseM(fmtScope(scopestack)+line.substring(0, line.indexOf(':')), line.substring(line.indexOf(':')+1, line.length())));
-                    // metas.add(parseM(fmtScope(scopestack)+line.substring(0, line.indexOf(':')), line.substring(line.indexOf(':')+1, line.length())));
-                    // metas.put(fmtScope(fname, scopestack)+line.substring(0,line.indexOf(':')), line.substring(line.indexOf(':')+1));
                     metas.put(fmtScope(fname, scopestack)+line.substring(0,line.indexOf(':')), parseMV(line.substring(line.indexOf(':')+1)));
                     break;
                 default:
@@ -286,8 +263,11 @@ public class ShapeBuilder {
             }
         }
     }
+    /*
+     * the way that names are stored in the HashMap's are too cumbersome for the asset files, so they must
+     * be converted
+     */
     private String resolveUJName(char k, String inst) {
-        // System.out.println("RESOLVE UJNAME: " + k);
         // System.out.println(inst);
         String[] parts = new String[]{inst.substring(0, (k=='J')?inst.indexOf('{'):inst.length()), (k=='J')?inst.substring(inst.indexOf('{')):""};
         String pat = ".*?<"+parts[0].substring(0, parts[0].lastIndexOf('.')).replace(".", "\\.")+">::"+parts[0].substring(parts[0].lastIndexOf('.')+1);
@@ -361,6 +341,7 @@ public class ShapeBuilder {
         try {
             String fn = Path.of(file).getFileName().toString();
             parse(process(fn, readLines(fn)).toArray(String[]::new));
+            System.out.println(defs.entrySet());
         } catch (NoSuchElementException NSE) {
             NSE.printStackTrace();
             System.out.println(defs.entrySet());
@@ -486,7 +467,11 @@ public class ShapeBuilder {
             if (poly) {
                 if (i.kind == 'v' || i.kind == 'V') {
                     poly = false;
-                    working.addShape(Shape.Poly(polc.toArray(Vec2[]::new), new Transform(working.transform, cstyle.pos, cstyle.rot)));
+                    Shape pols = Shape.Poly(polc.toArray(Vec2[]::new), new Transform(working.transform, cstyle.pos, cstyle.rot));
+                    pols.fill(cstyle.f);
+                    pols.stroke(cstyle.s);
+                    pols.strokewidth(cstyle.sw);
+                    working.addShape(pols);
                     polc.clear();
                 } else {
                     if (!(i.kind == 'g' || i.kind == 'G')) continue;
@@ -536,7 +521,6 @@ public class ShapeBuilder {
                     break;
                 case'r':case'R':
                     double r = Double.parseDouble(i.data.toString());
-                    // System.out.println(cstyle.pos);
                     Shape s = Shape.Circle(r, new Transform(working.transform, cstyle.pos, cstyle.rot));
                     s.fill(cstyle.f);
                     s.stroke(cstyle.s);
@@ -613,12 +597,6 @@ public class ShapeBuilder {
     }
     public Shape execute(String name) {
         return execute(name, new Transform());
-    }
-    public Shape toShape() {
-        return Shape.Poly(points.toArray(Vec2[]::new));
-    }
-    public Shape withTransform(Transform t) {
-        return Shape.Poly(points.toArray(Vec2[]::new), t);
     }
     public void debug() {
         System.out.println(defs.keySet());

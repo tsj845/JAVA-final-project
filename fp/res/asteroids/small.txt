@@ -1,5 +1,6 @@
 #-use,all.txt
-#-scope,astsmall
+#-scope,ast
+#-scope,small
 #-meta
 /count:~total(objs;"E")
 /names:~keyset(objs)
@@ -9,11 +10,12 @@ split:0
 #-objs
 I0
 M0,0
-Utemplate.STYLE
+Uast.template.STYLE
 R.05
-Jtemplate.CRATER{RADIUS=.015,?00,X=-.0225,Y=-0.01}
-Jtemplate.CRATER{RADIUS=.0125,?00,X=.0,Y=.025}
-Jtemplate.CRATER{RADIUS=.008,?00,X=0.02,Y=-.01}
+Jast.template.CRATER{RADIUS=.015,?00,X=-.0225,Y=-0.01}
+Jast.template.CRATER{RADIUS=.0125,?00,X=.0,Y=.025}
+Jast.template.CRATER{RADIUS=.008,?00,X=0.02,Y=-.01}
 E
+#-end
 #-end
 #-end
