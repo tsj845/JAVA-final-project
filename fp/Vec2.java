@@ -56,6 +56,14 @@ public class Vec2 {
         for (Vec2 p : points) min = Math.max(p.y,min);
         return min;
     }
+    public Vec2 rotRad(double angle) {
+        double scomp = Math.sin(angle);
+        double ccomp = Math.cos(angle);
+        return new Vec2(((ccomp*x)+(scomp*y)), ((-scomp*x)+(ccomp*y)));
+    }
+    public Vec2 rotDeg(double angle) {
+        return rotRad(Math.toRadians(angle));
+    }
     public Vec2 add(Vec2 other) {
         return new Vec2(this.x+other.x, this.y+other.y);
     }

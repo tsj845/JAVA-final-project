@@ -31,6 +31,22 @@ public class Transform {
         this.rotation = rotation;
         scale = 1.0d;
     }
+    private Transform(Vec2 t, double r, double s) {
+        parent = null;
+        translation = t;
+        rotation = r;
+        scale = s;
+    }
+    public Transform shallowCopy() {
+        return new Transform(translation, rotation, scale);
+    }
+    private Transform applied(Transform t) {
+        return new Transform(translation.mul(scale).add(t.translation.rotDeg(rotation)), t.rotation+rotation, t.scale*scale);
+    }
+    public Transform getEquivalent() {
+        if (parent == null) return shallowCopy();
+        return parent.getEquivalent().applied(this);
+    }
     public static Vec2[] scaledBy(Vec2[] input, double factor) {
         Vec2[] output = new Vec2[input.length];
         Vec2 center = Vec2.average(input);
@@ -71,6 +87,8 @@ public class Transform {
     public Vec2[] apply(Vec2[] input) {
         // if (parent != null) return offsetApply(input);
         Vec2[] output = new Vec2[input.length];
+        // double scomp = Math.sin(Math.toRadians(getTotalRotation()));
+        // double ccomp = Math.cos(Math.toRadians(getTotalRotation()));
         double scomp = Math.sin(Math.toRadians(rotation));
         double ccomp = Math.cos(Math.toRadians(rotation));
         for (int i = 0; i < input.length; i ++) {
@@ -93,6 +111,15 @@ public class Transform {
     public void translate(Vec2 translation) {
         this.translation = new Vec2(this.translation.x + translation.x, this.translation.y + translation.y);
     }
+    public void localTranslate(Vec2 translation) {
+        translate(translation.rotDeg(getTotalRotation()));
+    }
+    public double getTotalRotation() {
+        if (parent != null) {
+            return rotation + parent.getTotalRotation();
+        }
+        return rotation;
+    }
     public double getRotation() {
         return rotation;
     }
@@ -106,6 +133,9 @@ public class Transform {
         scale *= mult;
     }
     public String toString() {
+        if (parent != null) {
+            return getEquivalent().toString();
+        }
         return String.format("x=%f,y=%f,a=%f,s=%f", translation.x, translation.y, rotation, scale);
     }
 }

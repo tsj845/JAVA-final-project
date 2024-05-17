@@ -2,20 +2,9 @@ package fp;
 
 import java.awt.event.KeyEvent;
 
-import fp.drawing.DrawManager;
-import fp.drawing.Shape;
-import fp.drawing.ShapeBuilder;
-import fp.drawing.Transform;
-import fp.entities.Asteroid;
-import fp.entities.Collider;
-import fp.entities.Player;
-import fp.events.Event;
-import fp.events.EventListener;
-import fp.events.EventType;
-import fp.events.KEvent;
-import fp.events.MEvent;
-import fp.events.SEvent;
-import fp.events.StateEvent;
+import fp.drawing.*;
+import fp.entities.*;
+import fp.events.*;
 
 public class Main implements EventListener {
     private static final int FRAMERATE = 60;
@@ -27,6 +16,8 @@ public class Main implements EventListener {
     private static boolean coltestdo = false;
     public static volatile boolean gamerun = true;
     public static final int GAMEOBJS = StateEvent.getCode();
+    public static final int COUNTERS = StateEvent.getCode();
+    public static final int COMMANDS = StateEvent.getCode();
     public static final int SIGOVER;
     public static final SEvent OVER;
     public static final int SIGRELD;
@@ -47,16 +38,16 @@ public class Main implements EventListener {
         // System.out.println(e.type);
         if (e.type.key()) {
             KEvent ke = (KEvent)e;
-            if (atest) {
-                if (ke.type == EventType.KeyUp) {
-                    if (ke.code == KeyEvent.VK_R) {
-                        assetBuilder = new ShapeBuilder("fp/res/entry.txt");
-                        Observer.signal(RELD);
-                        Observer.signal(SEvent.DRAW);
-                    }
-                }
-            }
+            // if (atest) {
+            //     if (ke.type == EventType.KeyUp) {
+            //     }
+            // }
             if (ke.type == EventType.KeyUp) {
+                if (ke.code == KeyEvent.VK_R) {
+                    assetBuilder = new ShapeBuilder("fp/res/entry.txt");
+                    Observer.signal(RELD);
+                    Observer.signal(SEvent.DRAW);
+                }
                 if (ke.code == KeyEvent.VK_P) {
                     gamerun = false;
                 }
@@ -82,10 +73,19 @@ public class Main implements EventListener {
                 } else {
                     return;
                 }
+                // System.out.println("TICK");
+                // System.out.println(cols[0]);
+                // System.out.println(cols[1]);
+                // System.out.println(cols[2]);
+                // System.out.println(cols[0].collides(cols[1]));
+                // System.out.println(cols[0].collides(cols[2]));
+                DrawManager.ui.vals.put("hits", Boolean.toString(cols[0].collides(cols[1])));
+                DrawManager.ui.vals.put("LT", shps[0].transform.toString());
+                DrawManager.ui.vals.put("AT", shps[1].transform.toString());
+                DrawManager.ui.vals.put("LCT", cols[0].transform.toString());
+                DrawManager.ui.vals.put("ACT", cols[1].transform.toString());
                 Observer.signal(SEvent.TICK);
-                System.out.println("TICK");
-                System.out.println(cols[0].collides(cols[1]));
-                System.out.println(cols[0].collides(cols[2]));
+                Observer.signal(SEvent.DRAW);
             }
             // System.out.println(((KEvent)e));
         } else if (e.type.mouse()) {
@@ -127,39 +127,49 @@ public class Main implements EventListener {
     public static void coltest() {
         Transform t1 = new Transform(new Vec2(0.5, 0.5), 0.0);
         Transform t2 = new Transform(new Vec2(0.5, 0.5), 0.0);
-        Transform t3 = new Transform(new Vec2(0.5, 0.5), 0.0);
+        // Transform t3 = new Transform(new Vec2(0.5, 0.5), 0.0);
+        BuildResult b1 = assetBuilder.execute((String)assetBuilder.selectMeta("<player>::names", 1), t1),
+        b2 = assetBuilder.execute((String)assetBuilder.selectMeta("<ast.small>::names", 0), t2);
+        Shape s1 = b1.shape, s2 = b2.shape;
+        Collider c1 = b1.collider, c2 = b2.collider;
         // Shape s1 = Shape.Rect(0.2, 0.2, t1);
-        Vec2[] tp2 = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05, 0.0), new Vec2(0.025, 0.1)});
-        Shape s1 = Shape.Poly(tp2, t1);
-        Shape s2 = Shape.Circle(0.05, t2);
-        Vec2[] tripoints = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05,0.0), new Vec2(0.025,0.1)});
-        Shape s3 = Shape.Poly(tripoints, t3);
+        // Vec2[] tp2 = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05, 0.0), new Vec2(0.025, 0.1)});
+        // Shape s1 = Shape.Poly(tp2, t1);
+        // Shape s2 = Shape.Circle(0.05, t2);
+        // Vec2[] tripoints = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05,0.0), new Vec2(0.025,0.1)});
+        // Shape s3 = Shape.Poly(tripoints, t3);
         s1.fill(null);
         s2.fill(null);
-        s3.fill(null);
+        // s3.fill(null);
         s1.stroke(StdDraw.BLUE);
         s2.stroke(StdDraw.GREEN);
-        s3.stroke(StdDraw.RED);
+        // s3.stroke(StdDraw.RED);
         s1.strokewidth(0.002);
         s2.strokewidth(0.002);
-        s3.strokewidth(0.002);
+        // s3.strokewidth(0.002);
         DrawManager.add(s1);
         DrawManager.add(s2);
-        DrawManager.add(s3);
+        // DrawManager.add(s3);
         // Collider c1 = Collider.boxCollider(t1, 0.2, 0.2);
-        Collider c1 = Collider.triangleCollider(t1, tp2[0], tp2[1], tp2[2]);
-        Collider c2 = Collider.circleCollider(t2, 0.05);
-        Collider c3 = Collider.triangleCollider(t3, tripoints[0], tripoints[1], tripoints[2]);
+        // Collider c1 = Collider.triangleCollider(t1, tp2[0], tp2[1], tp2[2]);
+        // Collider c2 = Collider.circleCollider(t2, 0.05);
+        // Collider c3 = Collider.triangleCollider(t3, tripoints[0], tripoints[1], tripoints[2]);
         cols[0] = c1;
         cols[1] = c2;
-        cols[2] = c3;
+        // cols[0] = Collider.compoundCollider(t1);
+        // cols[0].addCollider(c1);
+        // cols[1] = Collider.compoundCollider(t2);
+        // cols[1].addCollider(c2);
+        // cols[2] = Collider.compoundCollider(t3);
+        // cols[2].addCollider(c3);
         shps[0] = s1;
         shps[1] = s2;
-        shps[2] = s3;
+        // shps[2] = s3;
         coltestdo = true;
         Observer.signal(new SEvent(null, SEvent.SIGTICK));
-        System.out.println(c1.collides(c2));
-        System.out.println(c1.collides(c3));
+        Observer.signal(new SEvent(null, SEvent.SIGDRAW));
+        // System.out.println(c1.collides(c2));
+        // System.out.println(c1.collides(c3));
     }
     public static void main(String[] args) {
         StdDraw.enableDoubleBuffering();
@@ -179,7 +189,7 @@ public class Main implements EventListener {
             }
         }
         // System.out.println(String.join(",\n", assetBuilder.getMetas("").toString().split(", ")));
-        System.out.println(String.join(",\n", assetBuilder.getMetas("<astsmall>").toString().split(", ")));
+        // System.out.println(String.join(",\n", assetBuilder.getMetas("<astsmall>").toString().split(", ")));
         assetBuilder.debug();
         final boolean loop = aloop;
         // new Player();

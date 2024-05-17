@@ -97,6 +97,18 @@ public class Shape implements Drawable {
         if (shapes == null) throw new IllegalArgumentException();
         return shapes.removeLast();
     }
+    public Shape get(int i) {
+        if (shapes == null) throw new IllegalArgumentException();
+        return shapes.get(i);
+    }
+    public Shape getLast() {
+        if (shapes == null) throw new IllegalArgumentException();
+        return shapes.getLast();
+    }
+    public Shape getFirst() {
+        if (shapes == null) throw new IllegalArgumentException();
+        return shapes.getFirst();
+    }
     public double minX() {
         if (type == ShapeType.Group) {
             double min = Double.POSITIVE_INFINITY;
@@ -106,7 +118,7 @@ public class Shape implements Drawable {
             return min;
         }
         if (type == ShapeType.Circ) {
-            return transform.getTranslation().x - points[0].y;
+            return transform.getEquivalent().getTranslation().x - points[0].y;
         }
         return Vec2.minX(transform.apply(points));
     }
@@ -114,12 +126,12 @@ public class Shape implements Drawable {
         if (type == ShapeType.Group) {
             double max = Double.NEGATIVE_INFINITY;
             for (Shape s : shapes) {
-                max = Math.min(max, s.maxX());
+                max = Math.max(max, s.maxX());
             }
             return max;
         }
         if (type == ShapeType.Circ) {
-            return transform.getTranslation().x + points[0].y;
+            return transform.getEquivalent().getTranslation().x + points[0].y;
         }
         return Vec2.maxX(transform.apply(points));
     }
@@ -132,7 +144,7 @@ public class Shape implements Drawable {
             return min;
         }
         if (type == ShapeType.Circ) {
-            return transform.getTranslation().y - points[0].y;
+            return transform.getEquivalent().getTranslation().y - points[0].y;
         }
         return Vec2.minY(transform.apply(points));
     }
@@ -140,12 +152,12 @@ public class Shape implements Drawable {
         if (type == ShapeType.Group) {
             double max = Double.NEGATIVE_INFINITY;
             for (Shape s : shapes) {
-                max = Math.min(max, s.maxY());
+                max = Math.max(max, s.maxY());
             }
             return max;
         }
         if (type == ShapeType.Circ) {
-            return transform.getTranslation().y + points[0].y;
+            return transform.getEquivalent().getTranslation().y + points[0].y;
         }
         return Vec2.maxY(transform.apply(points));
     }

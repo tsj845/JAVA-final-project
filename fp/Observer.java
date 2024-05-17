@@ -50,14 +50,26 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
         // System.out.println("DONE C2");
     }
     public static void register(EventListener el) {
+        // synchronized(listeners) {
+        //     listeners.add(el);
+        // }
         listeners.add(el);
     }
     public static void unregister(EventListener el) {
+        // synchronized(listeners) {
+        //     listeners.remove(el);
+        // }
         listeners.remove(el);
     }
     public static void signal(Event sig) {
         synchronized(SIG_LOCK) {
-            for (EventListener el : listeners) {
+            // synchronized(listeners) {
+            //     for (EventListener el : listeners) {
+            //         el.trigger(sig);
+            //     }
+            // }
+            // System.out.println(listeners);
+            for (EventListener el : listeners.toArray(EventListener[]::new)) {
                 el.trigger(sig);
             }
         }

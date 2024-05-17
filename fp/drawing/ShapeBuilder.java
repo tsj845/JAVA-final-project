@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import fp.StdDraw;
 import fp.Vec2;
+import fp.entities.Collider;
 
 public class ShapeBuilder {
     private class Instruction {
@@ -76,6 +77,8 @@ public class ShapeBuilder {
     private StyleData cstyle = new StyleData();
     private Path basePath;
     private final int APX = 1, QE = 2, QP = 3, QNP = 4;
+    private boolean colliderNext = false, notShape = false;
+    private Collider workc = null;
     private Shape working = null;
     private String fmtScope(String fname, LinkedList<String> scopestack) {
         String s = fname + "::<" + String.join(".", scopestack) + ">";
@@ -151,6 +154,9 @@ public class ShapeBuilder {
     }
     public Object selectMeta(String key, int index) {
         return ((Object[])getMeta(key))[index];
+    }
+    public Color color(String name) {
+        return colors.get(name);
     }
     /*
      * parses the content of asset files
@@ -390,6 +396,12 @@ public class ShapeBuilder {
                         ):(Double.parseDouble(parts[1]))
                     )
                 ));
+            case "geom":
+                colliderNext = true;
+                return "";
+            case "noshape":
+                notShape = true;
+                return "";
             default:return"";
         }
     }
@@ -399,7 +411,7 @@ public class ShapeBuilder {
         for (int i = 1; i < p.length; i ++) {
             String[] c = p[i].split(">(?!::)");
             f += evalBFunc(c[0]);
-            f += c[1];
+            f += c.length>1?c[1]:"";
         }
         return f;
     }
@@ -413,6 +425,7 @@ public class ShapeBuilder {
             i = i.copy();
             if ((i.kind & 0xff) == 2) {continue;}
             i.data = prepAllI(i.data.toString());
+            if (i.kind == 'H') continue;
             if (function) {
                 ParamData pd = argstack.getLast();
                 if (contd > 0) {
@@ -468,11 +481,19 @@ public class ShapeBuilder {
                 if (i.kind == 'v' || i.kind == 'V') {
                     poly = false;
                     Shape pols = Shape.Poly(polc.toArray(Vec2[]::new), new Transform(working.transform, cstyle.pos, cstyle.rot));
+                    if (colliderNext) {
+                        workc.addCollider(Collider.ofPoly(pols.transform, pols.points));
+                    }
+                    colliderNext = false;
+                    polc.clear();
+                    if (notShape) {
+                        notShape = false;
+                        continue;
+                    }
                     pols.fill(cstyle.f);
                     pols.stroke(cstyle.s);
                     pols.strokewidth(cstyle.sw);
                     working.addShape(pols);
-                    polc.clear();
                 } else {
                     if (!(i.kind == 'g' || i.kind == 'G')) continue;
                     abs = i.kind == 'G';
@@ -519,13 +540,32 @@ public class ShapeBuilder {
                 case'w':case'W':
                     cstyle.sw = Double.parseDouble(i.data.toString());
                     break;
+                case'b':case'B':
+                    String dat = i.data.toString();
+                    double bhw = Double.parseDouble(dat.substring(0, dat.indexOf(','))), bhh = Double.parseDouble(dat.substring(dat.indexOf(',')+1));
+                    Shape boxs = Shape.Rect(bhw, bhh, new Transform(working.transform, cstyle.pos, cstyle.rot));
+                    boxs.fill(cstyle.f);
+                    boxs.stroke(cstyle.s);
+                    boxs.strokewidth(cstyle.sw);
+                    if (!notShape)
+                    working.addShape(boxs);
+                    notShape = false;
+                    if (colliderNext) {
+                        workc.addCollider(Collider.boxCollider(boxs.transform, bhw, bhh));
+                    }
+                    break;
                 case'r':case'R':
                     double r = Double.parseDouble(i.data.toString());
                     Shape s = Shape.Circle(r, new Transform(working.transform, cstyle.pos, cstyle.rot));
                     s.fill(cstyle.f);
                     s.stroke(cstyle.s);
                     s.strokewidth(cstyle.sw);
+                    if (!notShape)
                     working.addShape(s);
+                    notShape = false;
+                    if (colliderNext) {
+                        workc.addCollider(Collider.circleCollider(s.transform, r));
+                    }
                     break;
                 case'm':
                     String[] relparts = i.data.toString().split(",");
@@ -555,6 +595,7 @@ public class ShapeBuilder {
                     System.out.println(i);
                     break;
             }
+            colliderNext = false;
         }
     }
     private ParamData parseArgs(ArgData ad, String[] args) {
@@ -584,18 +625,20 @@ public class ShapeBuilder {
         executeR(n, true);
         argstack.removeLast();
     }
-    public Shape execute(String name, Transform t) {
-        System.out.println(name);
+    public BuildResult execute(String name, Transform t) {
+        // System.out.println(name);
         working = Shape.Group(t);
+        workc = Collider.compoundCollider(working.transform);
         cstyle = new StyleData();
         stylestack.clear();
         argstack.clear();
         executeR(name, false);
-        Shape r = working;
+        BuildResult r = new BuildResult(working, workc);
         working = null;
+        workc = null;
         return r;
     }
-    public Shape execute(String name) {
+    public BuildResult execute(String name) {
         return execute(name, new Transform());
     }
     public void debug() {

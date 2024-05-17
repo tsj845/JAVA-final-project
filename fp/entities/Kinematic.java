@@ -5,11 +5,14 @@ import fp.drawing.Shape;
 import fp.drawing.Transform;
 
 public abstract class Kinematic {
+    public static final double EDGE_TOLERANCE = 0.01;
+    public static final double MIN_SPEED = 0.002;
     private Vec2 velocity;
     private double angularVelocity;
     private KinParams params;
     protected Shape shape;
     protected Collider collider;
+    protected boolean wraps = true;
     protected Kinematic() {
         velocity = new Vec2();
         angularVelocity = 0.0d;
@@ -19,6 +22,9 @@ public abstract class Kinematic {
         velocity = new Vec2();
         angularVelocity = 0.0d;
         this.params = params;
+    }
+    public final boolean collides(Kinematic other) {
+        return collider.collides(other.collider);
     }
     public final Vec2 getVelocity() {return velocity;}
     public final void setVelocity(Vec2 velocity) {this.velocity = velocity;}
@@ -31,7 +37,7 @@ public abstract class Kinematic {
         angularVelocity += accel;
     }
     public final void linearImpulseRaw(Vec2 impulse) {
-        velocity = velocity.add(impulse.div(params.mass()));
+        velocity = velocity.add(impulse.div(params.mass()).rotDeg(shape.transform.getRotation()));
     }
     public final void angularImpulseRaw(double impulse) {
         angularVelocity += impulse/params.moment();
@@ -58,22 +64,54 @@ public abstract class Kinematic {
     public final void realImpulse(Vec2 application, Vec2 force, double dt) {
         realImpulseRaw(application, force.mul(dt));
     }
-    public void update() {
+    public void update(double dt) {
         Transform t = shape.transform;
-        t.translate(velocity);
-        Vec2 vd = velocity.sub(velocity.norm().mul(-params.friction()));
-        velocity = (vd.norm() == velocity.norm() || (vd.x==0.0d&&vd.y==0.0d)) ? vd : new Vec2();
-        if (shape.minX() > 1.05) {
-            t.translate(new Vec2(-1,0));
+        t.translate(velocity.mul(dt));
+        if (params.friction() > 0) {
+            double sx = Math.signum(velocity.x), sy = Math.signum(velocity.y);
+            Vec2 dv = velocity.norm().mul(-Math.min(velocity.mag(), params.friction())).div(params.mass());
+            // System.out.println(dv);
+            accelLinear(dv, dt);
+            if (Math.signum(velocity.x) * sx < 0) {
+                velocity = new Vec2(0, velocity.y);
+            }
+            if (Math.signum(velocity.y) * sy < 0) {
+                velocity = new Vec2(velocity.x, 0);
+            }
         }
-        if (shape.maxX() < -0.05) {
-            t.translate(new Vec2(1, 0));
+        if (velocity.mag() < Kinematic.MIN_SPEED) {
+            velocity = new Vec2();
         }
-        if (shape.minY() > 1.05) {
-            t.translate(new Vec2(0, -1));
+        // Vec2 vd = velocity.sub(velocity.norm().mul(-params.friction()).mul(dt));
+        // velocity = (vd.norm() == velocity.norm() || (vd.x==0.0d&&vd.y==0.0d)) ? vd : new Vec2();
+        if (shape.minX() > 1+Kinematic.EDGE_TOLERANCE) {
+            if (!wraps) {
+                escaped();
+                return;
+            }
+            t.translate(new Vec2(-shape.maxX()-(Kinematic.EDGE_TOLERANCE/2),0));
         }
-        if (shape.maxY() < -0.05) {
-            t.translate(new Vec2(0, 1));
+        if (shape.maxX() < -Kinematic.EDGE_TOLERANCE) {
+            if (!wraps) {
+                escaped();
+                return;
+            }
+            t.translate(new Vec2(-shape.minX()+1+(Kinematic.EDGE_TOLERANCE/2), 0));
+        }
+        if (shape.minY() > 1+Kinematic.EDGE_TOLERANCE) {
+            if (!wraps) {
+                escaped();
+                return;
+            }
+            t.translate(new Vec2(0, -shape.maxY()-(Kinematic.EDGE_TOLERANCE/2)));
+        }
+        if (shape.maxY() < -Kinematic.EDGE_TOLERANCE) {
+            if (!wraps) {
+                escaped();
+                return;
+            }
+            t.translate(new Vec2(0, -shape.minY()+1+(Kinematic.EDGE_TOLERANCE/2)));
         }
     }
+    void escaped() {}
 }

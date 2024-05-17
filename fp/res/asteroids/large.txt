@@ -8,6 +8,7 @@ split:+2
 #-objs
 I0
 Uast.template.STYLE
+H<geom>
 R.1
 E
 #-end

@@ -9,6 +9,7 @@ split:+2
 I0
 M0,0
 Uast.template.STYLE
+H<geom>
 R.075
 Jast.template.CRATER{RADIUS=.025,?00,X=.0125,Y=0}
 E

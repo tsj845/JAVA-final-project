@@ -1,6 +1,7 @@
 package fp.entities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import fp.Vec2;
 import fp.drawing.Transform;
@@ -9,7 +10,7 @@ public class Collider {
     private enum ColliderType {
         Box,Circle,Triangle,Compound;
     }
-    private final Transform transform;
+    public final Transform transform;
     private ColliderType type;
     private double[] data;
     private CLine[] cache;
@@ -44,6 +45,16 @@ public class Collider {
         c.data = new double[]{p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,center.x,center.y};
         return c;
     }
+    public static Collider ofPoly(Transform t, Vec2[] polypoints) {
+        Collider cf = Collider.compoundCollider(t);
+        return cf;
+    }
+    public void addCollider(Collider subc) {
+        if (type != ColliderType.Compound) {
+            throw new IllegalStateException("attempted to add a sub collider to a non-compound collider");
+        }
+        subs.add(subc);
+    }
     private Collider[] getSubs() {
         if (type == ColliderType.Compound) {
             return subs.toArray(Collider[]::new);
@@ -52,7 +63,7 @@ public class Collider {
     }
     public boolean collides(Collider other) {
         for (Collider tc : getSubs()) {
-            for (Collider oc: other.getSubs()) {
+            for (Collider oc : other.getSubs()) {
                 if (tc._collides(oc)) return true;
             }
         }
@@ -117,7 +128,7 @@ public class Collider {
     }
     private static boolean cBoxContains(Collider cbox, Vec2 p) {
         CLine[] tcache = cBoxGetTransformed(cbox);
-        CLine chk = new CLine(cbox.transform.getTranslation(), p);
+        CLine chk = new CLine(cbox.transform.getEquivalent().getTranslation(), p);
         for (CLine tst : tcache) {
             if (chk.intersects(tst)) return false;
         }
@@ -161,17 +172,17 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
         return c.sqDist(p) <= r2;
     }
     private static boolean cCircContains(Collider c, Vec2 p) {
-        return cCircContains(c.transform.getTranslation(), c.data[1], p);
+        return cCircContains(c.transform.getEquivalent().getTranslation(), c.data[1], p);
     }
     private static boolean cBoxBox(Collider c1, Collider c2) {
         CLine[] tc1 = cBoxGetTransformed(c1);
         CLine[] tc2 = cBoxGetTransformed(c2);
-        Vec2 c = c1.transform.getTranslation();
+        Vec2 c = c1.transform.getEquivalent().getTranslation();
         return cBoxContains(tc1, c, tc2[0].p1) || cBoxContains(tc1, c, tc2[1].p1) || cBoxContains(tc1, c, tc2[2].p1) || cBoxContains(tc1, c, tc2[3].p1);
     }
     private static boolean cBoxCirc(Collider c1, Collider c2) {
-        System.out.println("BC");
-        Vec2 ccenter = c2.transform.getTranslation();
+        // System.out.println("BC");
+        Vec2 ccenter = c2.transform.getEquivalent().getTranslation();
         CLine[] tcache = cBoxGetTransformed(c1);
         CLine hchk = new CLine(ccenter, tcache[0].angle-90, c2.data[0]).mirror(true);
         CLine vchk = new CLine(ccenter, tcache[1].angle-90, c2.data[0]).mirror(true);
@@ -180,7 +191,7 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
     }
     private static boolean cBoxTri(Collider c1, Collider c2) {
         CLine[] bc = cBoxGetTransformed(c1);
-        Vec2 c = c1.transform.getTranslation();
+        Vec2 c = c1.transform.getEquivalent().getTranslation();
         CLine[] tc = cTriGetTransformed(c2);
         return (
             cBoxContains(bc, c, tc[0].p1) || cBoxContains(bc, c, tc[1].p1) || cBoxContains(bc, c, tc[2].p1) ||
@@ -189,10 +200,10 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
         );
     }
     private static boolean cCircCirc(Collider c1, Collider c2) {
-        return c1.transform.getTranslation().sqDist(c2.transform.getTranslation()) <= (c1.data[1]+c2.data[1]);
+        return c1.transform.getEquivalent().getTranslation().sqDist(c2.transform.getEquivalent().getTranslation()) <= (c1.data[1]+c2.data[1]);
     }
     private static boolean cCircTri(Collider c1, Collider c2) {
-        Vec2 c = c1.transform.getTranslation();
+        Vec2 c = c1.transform.getEquivalent().getTranslation();
         double r2 = c1.data[1];
         CLine[] tc = cTriGetTransformed(c2);
         CLine chk1 = new CLine(c, tc[0].angle-90, c2.data[0]).mirror(true);
@@ -212,5 +223,17 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
             tc1[0].intersects(tc2[0]) || tc1[0].intersects(tc2[1]) ||
             tc1[1].intersects(tc2[0]) || tc1[1].intersects(tc2[1])
         );
+    }
+    public String toString() {
+        if (type == ColliderType.Compound) {
+            return String.format("GRP{%s}::%s", transform, Arrays.toString(getSubs()));
+        }
+        if (type == ColliderType.Box) {
+            return String.format("BOX{w=%f,h=%f,%s}", data[0], data[1], transform);
+        }
+        if (type == ColliderType.Circle) {
+            return String.format("CIR{r=%f,%s}", data[0], transform);
+        }
+        return String.format("TRI{%s}::[%s,%s,%s]", transform, new Vec2(data[0], data[1]), new Vec2(data[2], data[3]), new Vec2(data[4], data[5]));
     }
 }

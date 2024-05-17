@@ -10,6 +10,15 @@ P
 /new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.0875,0), new Vec2(0.05,0.0875)
 G.0125,0;.05,.025;.0875,0;.05,.0875
 V
+H<geom><noshape>
+B.075,.0875
+E
+ILASER
+Ccommon.WHITE
+Scommon.BORD
+W.002
+H<geom>
+B.006,.05
 E
 #-end
 #-end
