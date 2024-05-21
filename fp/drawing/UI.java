@@ -15,7 +15,6 @@ public class UI implements Drawable {
         StdDraw.setPenColor(new Color(230, 230, 230));
         final Font of = StdDraw.getFont();
         StdDraw.setFont(new Font(Font.MONOSPACED, Font.PLAIN, of.getSize()/2));
-        int ec = 0;
         double tx = 0, ty = 0.95;
         for (Entry<String, String> e : vals.entrySet()) {
             if (tx < 1) {
@@ -29,13 +28,18 @@ public class UI implements Drawable {
                 tx = 1;
             }
         }
-        // StdDraw.setFont(of.deriveFont(of.getSize2D()*2));
         StdDraw.setFont(new Font(Font.MONOSPACED, Font.PLAIN, of.getSize()*2));
         if (Game.gameover) {
             StdDraw.text(0.5, 0.5, "GAME OVER");
+            StdDraw.setFont(new Font(Font.MONOSPACED, Font.PLAIN, of.getSize()));
+            StdDraw.text(0.5, 0.2, "Quit     play Again");
+            StdDraw.setFont(new Font(Font.MONOSPACED, Font.PLAIN, of.getSize()*2));
+        } else if (Game.paused) {
+            StdDraw.text(0.5, 0.5, "PAUSED");
+        } else {
+            StdDraw.setFont(new Font(Font.MONOSPACED, Font.PLAIN, of.getSize()));
         }
-        StdDraw.setFont(new Font(Font.MONOSPACED, Font.PLAIN, of.getSize()));
-        if (Game.gameover) {
+        if (Game.gameover || Game.paused) {
             StdDraw.text(0.5, 0.4, Integer.toString(Game.score));
         } else {
             StdDraw.text(0.5, 0.9, Integer.toString(Game.score));

@@ -1,7 +1,6 @@
 package fp.entities;
 
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 
 import fp.*;
 import fp.drawing.*;
@@ -9,8 +8,9 @@ import fp.events.*;
 
 public class Player extends Kinematic implements Entity, EventListener, Drawable {
     private static final double STOP_TIME = 2.5;
-    private static final int FCOOLDOWN = Main.toFrames(50);
+    private static final int FCOOLDOWN = Main.toFrames(100);
     private static final int BCOOLDOWN = Main.toFrames(1000);
+    private static final int RCOOLDOWN = Main.toFrames(500);
     private static final double SSCALE = (double)Main.toFrames(100);
     // private static final double SSCALE = 1;
     private static final double PBSPEED = 0.3;
@@ -18,11 +18,15 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     private int health;
     private int FCOOL = Player.FCOOLDOWN;
     private int BCOOL = Player.BCOOLDOWN;
+    private int RCOOL = Player.RCOOLDOWN;
+    private int MSHOT = 15;
+    private int shots = 15;
     private int cooldown = 0; // cooldown for attack
     private int bnkc = 0;
+    private int relc = 0;
     private boolean[] inputbuf = new boolean[8], held = new boolean[8];
-    private double rotspeed = 2.5;
-    private Vec2 left=new Vec2(-Player.PSPEED,0).div(Player.SSCALE),right=new Vec2(Player.PSPEED,0).div(Player.SSCALE),up=new Vec2(0,Player.PSPEED).div(Player.SSCALE),down=new Vec2(0,-Player.PSPEED).div(Player.SSCALE);
+    private double rotspeed = 6;
+    private Vec2 mov = new Vec2(0,Player.PSPEED).div(Player.SSCALE);
     private Vec2 BLINKDIST = new Vec2(0, 0.25);
     private Vec2 nose;
     private void findNose() {
@@ -39,7 +43,7 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
         p.shape = br.shape;
         p.collider = br.collider;
         p.findNose();
-        System.out.println(p.collider);
+        // System.out.println(p.collider);
     }
     public Player() {
         super(new KinParams(1, 1, 1.0/Player.STOP_TIME));
@@ -59,7 +63,7 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
         // shape.strokewidth(0.01);
         shape.transform.setTranslation(new Vec2(0.5, 0.65));
         findNose();
-        System.out.println(shape);
+        // System.out.println(shape);
         DrawManager.add(this);
         health = 100;
         Observer.register(this);
@@ -102,6 +106,14 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
                 default:
                     break;
             }
+            if (Main.DEBUGMDODE) {
+                if (ke.code == KeyEvent.VK_U) {
+                    rotspeed += 0.1;
+                }
+                if (ke.code == KeyEvent.VK_Y) {
+                    rotspeed -= 0.1;
+                }
+            }
             if (which == -1) return;
             if (ke.type == EventType.KeyDown) {
                 inputbuf[which] = true;
@@ -114,25 +126,33 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     }
     public void draw() {
         shape.draw();
-        Shape sh = shape.getFirst();
-        Transform t = sh.transform;
-        Vec2 f = t.getTranslation();
-        Vec2[] tl = t.apply(sh.points);
-        StdDraw.setPenColor(StdDraw.WHITE);
-        StdDraw.textRight(1, 0.25, String.format("Vx=%f, Vy=%f", super.getVelocity().x, super.getVelocity().y));
-        StdDraw.textLeft(0, 0.25, String.format("X=%f, Y=%f", f.x, f.y));
-        StdDraw.textLeft(0, 0.35, String.format("<X=%f, <Y=%f", Vec2.minX(tl), Vec2.minY(tl)));
-        StdDraw.textLeft(0, 0.45, String.format(">X=%f, >Y=%f", Vec2.maxX(tl), Vec2.maxY(tl)));
+        // Shape sh = shape.getFirst();
+        // Transform t = sh.transform;
+        // Vec2 f = t.getTranslation();
+        // Vec2[] tl = t.apply(sh.points);
+        // StdDraw.setPenColor(StdDraw.WHITE);
+        // StdDraw.textRight(1, 0.25, String.format("Vx=%f, Vy=%f", super.getVelocity().x, super.getVelocity().y));
+        // StdDraw.textLeft(0, 0.25, String.format("X=%f, Y=%f", f.x, f.y));
+        // StdDraw.textLeft(0, 0.35, String.format("<X=%f, <Y=%f", Vec2.minX(tl), Vec2.minY(tl)));
+        // StdDraw.textLeft(0, 0.45, String.format(">X=%f, >Y=%f", Vec2.maxX(tl), Vec2.maxY(tl)));
     }
     private void fire() {
         // new Thread(){public void run(){new Laser();}}.start();
-        new Laser();
+        if (shots > 0) {
+            shots --;
+            new Laser();
+        }
     }
     private void blink() {
         shape.transform.localTranslate(BLINKDIST);
     }
     public void update(double dt) {
         super.update(dt);
+        if (relc > 0) relc --;
+        else {
+            relc = RCOOL;
+            shots = Math.min(shots + 1, MSHOT);
+        }
         if (bnkc > 0) bnkc --;
         else {
             if (inputbuf[3]) {
@@ -156,7 +176,7 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
             // super.accelLinear(new Vec2(ov.x/2, ov.y/2), dt);
             inputbuf[7]=held[7];
         } else if (inputbuf[2]) {
-            super.accelLinear(up.rotDeg(t.getRotation()), dt);
+            super.accelLinear(mov.rotDeg(t.getRotation()), dt);
             inputbuf[2]=held[2];}
         // if (inputbuf[3]) {
         //     super.accelLinear(down, dt);

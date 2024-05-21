@@ -7,6 +7,7 @@ import fp.entities.*;
 import fp.events.*;
 
 public class Main implements EventListener {
+    public static boolean DEBUGMDODE = false;
     private static final int FRAMERATE = 60;
     private static final int FRAMEDELAY = 1000/FRAMERATE;
     private static int quickCode = StateEvent.getCode();
@@ -128,10 +129,12 @@ public class Main implements EventListener {
         Transform t1 = new Transform(new Vec2(0.5, 0.5), 0.0);
         Transform t2 = new Transform(new Vec2(0.5, 0.5), 0.0);
         // Transform t3 = new Transform(new Vec2(0.5, 0.5), 0.0);
-        BuildResult b1 = assetBuilder.execute((String)assetBuilder.selectMeta("<player>::names", 1), t1),
+        BuildResult b1 = assetBuilder.execute((String)assetBuilder.selectMeta("<player>::names", 0), t1),
         b2 = assetBuilder.execute((String)assetBuilder.selectMeta("<ast.small>::names", 0), t2);
         Shape s1 = b1.shape, s2 = b2.shape;
         Collider c1 = b1.collider, c2 = b2.collider;
+        System.out.println(c1);
+        System.out.println(c2);
         // Shape s1 = Shape.Rect(0.2, 0.2, t1);
         // Vec2[] tp2 = Vec2.normalize(new Vec2[]{new Vec2(), new Vec2(0.05, 0.0), new Vec2(0.025, 0.1)});
         // Shape s1 = Shape.Poly(tp2, t1);
@@ -172,12 +175,16 @@ public class Main implements EventListener {
         // System.out.println(c1.collides(c3));
     }
     public static void main(String[] args) {
+        StdDraw.setTitle("Java FP");
         StdDraw.enableDoubleBuffering();
         Main m = new Main();
         Observer.register(m);
         boolean aloop = true;
         boolean qimm = false;
         for (String arg : args) {
+            if (arg.equalsIgnoreCase("dbg")) {
+                DEBUGMDODE = true;
+            }
             if (arg.equalsIgnoreCase("noloop")) {
                 aloop = false;
             }
@@ -190,7 +197,7 @@ public class Main implements EventListener {
         }
         // System.out.println(String.join(",\n", assetBuilder.getMetas("").toString().split(", ")));
         // System.out.println(String.join(",\n", assetBuilder.getMetas("<astsmall>").toString().split(", ")));
-        assetBuilder.debug();
+        // assetBuilder.debug();
         final boolean loop = aloop;
         // new Player();
         // Observer.signal(new SEvent(null, SEvent.SIGTICK));

@@ -1,7 +1,9 @@
 package fp.drawing;
 
+import java.awt.Color;
 import java.util.LinkedList;
 
+import fp.Game;
 import fp.Observer;
 import fp.StdDraw;
 import fp.events.Event;
@@ -23,9 +25,14 @@ public class DrawManager implements EventListener {
         //     }
         //     StdDraw.show();
         // }
+        // StdDraw.clear();
         StdDraw.clear(StdDraw.BLACK);
         for (Drawable s : stack.toArray(Drawable[]::new)) {
             s.draw();
+        }
+        if (Game.paused) {
+            StdDraw.setPenColor(new Color(0, 0, 0, 200));
+            StdDraw.filledRectangle(0.5, 0.5, 0.5, 0.5);
         }
         ui.draw();
         StdDraw.show();
@@ -41,6 +48,9 @@ public class DrawManager implements EventListener {
         //     return stack.remove(s);
         // }
         return stack.remove(s);
+    }
+    public static void clear() {
+        stack.clear();
     }
     public void trigger(Event e) {
         if (e.type.signal()) {

@@ -2,16 +2,21 @@
 #-scope,player
 #-objs
 IPLAYER
-/C200,200,200
 Ccommon.WHITE
 Scommon.BORD
 W.01
 P
-/new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.0875,0), new Vec2(0.05,0.0875)
 G.0125,0;.05,.025;.0875,0;.05,.0875
 V
 H<geom><noshape>
-B.075,.0875
+P
+G-.0375,-.028125;0,-.003125;0,.059375
+V
+H<geom><noshape>
+P
+G0,-.003125;.0375,-.028125;0,.059375
+V
+M0,0
 E
 ILASER
 Ccommon.WHITE

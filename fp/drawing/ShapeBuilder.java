@@ -480,9 +480,9 @@ public class ShapeBuilder {
             if (poly) {
                 if (i.kind == 'v' || i.kind == 'V') {
                     poly = false;
-                    Shape pols = Shape.Poly(polc.toArray(Vec2[]::new), new Transform(working.transform, cstyle.pos, cstyle.rot));
+                    Shape pols = (colliderNext) ? Shape.RawPoly(polc.toArray(Vec2[]::new), new Transform(working.transform, cstyle.pos, cstyle.rot)) : Shape.Poly(polc.toArray(Vec2[]::new), new Transform(working.transform, cstyle.pos, cstyle.rot));
                     if (colliderNext) {
-                        workc.addCollider(Collider.ofPoly(pols.transform, pols.points));
+                        workc.addCollider(Collider.triangleCollider(pols.transform, polc.get(0), polc.get(1), polc.get(2)));
                     }
                     colliderNext = false;
                     polc.clear();
@@ -595,6 +595,7 @@ public class ShapeBuilder {
                     System.out.println(i);
                     break;
             }
+            if (poly) continue;
             colliderNext = false;
         }
     }

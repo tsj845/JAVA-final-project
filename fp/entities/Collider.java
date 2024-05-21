@@ -171,9 +171,9 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
     private static boolean cCircContains(Vec2 c, double r2, Vec2 p) {
         return c.sqDist(p) <= r2;
     }
-    private static boolean cCircContains(Collider c, Vec2 p) {
-        return cCircContains(c.transform.getEquivalent().getTranslation(), c.data[1], p);
-    }
+    // private static boolean cCircContains(Collider c, Vec2 p) {
+    //     return cCircContains(c.transform.getEquivalent().getTranslation(), c.data[1], p);
+    // }
     private static boolean cBoxBox(Collider c1, Collider c2) {
         CLine[] tc1 = cBoxGetTransformed(c1);
         CLine[] tc2 = cBoxGetTransformed(c2);

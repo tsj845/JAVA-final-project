@@ -82,6 +82,9 @@ public class Shape implements Drawable {
     public static Shape Poly(Vec2[] points) {
         return new Shape(ShapeType.Poly, Vec2.normalize(points));
     }
+    public static Shape RawPoly(Vec2[] points, Transform t) {
+        return new Shape(ShapeType.Poly, points, t);
+    }
     public static Shape Poly(Vec2[] points, Transform t) {
         return new Shape(ShapeType.Poly, Vec2.normalize(points), t);
     }

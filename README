@@ -1,0 +1,12 @@
+to execute, run "./run.sh"
+
+this project is a basic copy of the arcade game asteroids
+controlled with ARROW_UP to move forward, ARROW_LEFT and ARROW_RIGHT to turn
+and ARROW_DOWN for a short teleport forward
+
+difficulty increases over time, and score is accumulated by destroying asteroids, with the
+exact amount determined by the size of the asteroid destroyed
+
+press ESCAPE to pause the game
+
+after a game over, press Q to quit, or A to play again
