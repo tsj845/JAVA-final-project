@@ -12,7 +12,6 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     private static final int BCOOLDOWN = Main.toFrames(1000);
     private static final int RCOOLDOWN = Main.toFrames(500);
     private static final double SSCALE = (double)Main.toFrames(100);
-    // private static final double SSCALE = 1;
     private static final double PBSPEED = 0.3;
     private static final double PSPEED = PBSPEED*Game.FRAMEDELAY;
     private int health;
@@ -43,29 +42,14 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
         p.shape = br.shape;
         p.collider = br.collider;
         p.findNose();
-        // System.out.println(p.collider);
     }
     public Player() {
         super(new KinParams(1, 1, 1.0/Player.STOP_TIME));
-        // ShapeBuilder sb = new ShapeBuilder();
-        // sb.push(new FPoint(0, 0));
-        // sb.push(new FPoint(0.01, 0));
-        // sb.push(new FPoint(0.01, 0.01));
-        // sb.push(new FPoint(0, 0.01));
-        // shape = sb.toShape();
         Player.generate(this, new Transform());
-        // shape = Shape.Poly(new Vec2[]{new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.0875,0), new Vec2(0.05,0.0875)});
-        // shape = Shape.Poly(new Vec2[]{new Vec2(0.0125,0), new Vec2(0.05,0.025), new Vec2(0.05,0.0875)});
-        // shape = Shape.Rect(0.1, 0.1);
-        // shape.fill(new Color(0, 255, 0));
-        // shape.fill(StdDraw.GRAY);
-        // shape.stroke(StdDraw.BLACK);
-        // shape.strokewidth(0.01);
-        shape.transform.setTranslation(new Vec2(0.5, 0.65));
+        shape.transform.setTranslation(new Vec2(0.5, 0.5));
         findNose();
-        // System.out.println(shape);
-        DrawManager.add(this);
         health = 100;
+        DrawManager.add(this);
         Observer.register(this);
     }
     public void reload() {
@@ -126,18 +110,8 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
     }
     public void draw() {
         shape.draw();
-        // Shape sh = shape.getFirst();
-        // Transform t = sh.transform;
-        // Vec2 f = t.getTranslation();
-        // Vec2[] tl = t.apply(sh.points);
-        // StdDraw.setPenColor(StdDraw.WHITE);
-        // StdDraw.textRight(1, 0.25, String.format("Vx=%f, Vy=%f", super.getVelocity().x, super.getVelocity().y));
-        // StdDraw.textLeft(0, 0.25, String.format("X=%f, Y=%f", f.x, f.y));
-        // StdDraw.textLeft(0, 0.35, String.format("<X=%f, <Y=%f", Vec2.minX(tl), Vec2.minY(tl)));
-        // StdDraw.textLeft(0, 0.45, String.format(">X=%f, >Y=%f", Vec2.maxX(tl), Vec2.maxY(tl)));
     }
     private void fire() {
-        // new Thread(){public void run(){new Laser();}}.start();
         if (shots > 0) {
             shots --;
             new Laser();
@@ -173,26 +147,16 @@ public class Player extends Kinematic implements Entity, EventListener, Drawable
         if (inputbuf[7]) {
             Vec2 ov = super.getVelocity().mul(-1);
             super.accelLinear(new Vec2(Math.signum(ov.x)*Math.sqrt(Math.abs(ov.x)*2), Math.signum(ov.y)*Math.sqrt(Math.abs(ov.y)*2)), dt);
-            // super.accelLinear(new Vec2(ov.x/2, ov.y/2), dt);
             inputbuf[7]=held[7];
         } else if (inputbuf[2]) {
             super.accelLinear(mov.rotDeg(t.getRotation()), dt);
             inputbuf[2]=held[2];}
-        // if (inputbuf[3]) {
-        //     super.accelLinear(down, dt);
-        //     inputbuf[3]=held[3];}
         if (inputbuf[5]) {
             t.rotate(-rotspeed);
             inputbuf[5]=held[5];}
         if (inputbuf[6]) {
             t.rotate(rotspeed);
             inputbuf[6]=held[6];}
-        // if (inputbuf[0]) {t.localTranslate(left);inputbuf[0]=held[0];}
-        // if (inputbuf[1]) {t.localTranslate(right);inputbuf[1]=held[1];}
-        // if (inputbuf[2]) {t.localTranslate(up);inputbuf[2]=held[2];}
-        // if (inputbuf[3]) {t.localTranslate(down);inputbuf[3]=held[3];}
-        // if (inputbuf[5]) {t.rotate(-rotspeed);inputbuf[5]=held[5];}
-        // if (inputbuf[6]) {t.rotate(rotspeed);inputbuf[6]=held[6];}
     }
     public Vec2 nose() {
         return nose;

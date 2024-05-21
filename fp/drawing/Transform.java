@@ -53,11 +53,7 @@ public class Transform {
         for (int i = 0; i < input.length; i ++) {
             Vec2 o = input[i];
             output[i] = center.add(o.rel(center).mul(factor));
-            // output[i] = input[i].mul(factor);
         }
-        // System.out.println("centers:");
-        // System.out.println(center);
-        // System.out.println(Vec2.average(output));
         return Vec2.normalize(output);
     }
     public static Vec2[] scaledAbs(Vec2[] input, double value) {
@@ -68,33 +64,12 @@ public class Transform {
         }
         return output;
     }
-    // private Vec2[] offsetApply(Vec2[] input) {
-    //     Vec2[] output = new Vec2[input.length];
-    //     double scomp = Math.sin(Math.toRadians(rotation));
-    //     double ccomp = Math.cos(Math.toRadians(rotation));
-    //     for (int i = 0; i < input.length; i ++) {
-    //         // Vec2 o = input[i];
-    //         Vec2 o = input[i].mul(scale);
-    //         // output[i] = new Vec2(((ccomp*o.x)+(scomp*o.y))*scale+translation.x, ((-scomp*o.x)+(ccomp*o.y))*scale+translation.y);
-    //         output[i] = new Vec2(((ccomp*o.x)+(scomp*o.y))+translation.x, ((-scomp*o.x)+(ccomp*o.y))+translation.y);
-    //     }
-    //     for (int i = 0; i < output.length; i ++) {
-    //         Vec2 o = output[i];
-    //         output[i] = new Vec2();
-    //     }
-    //     return output;
-    // }
     public Vec2[] apply(Vec2[] input) {
-        // if (parent != null) return offsetApply(input);
         Vec2[] output = new Vec2[input.length];
-        // double scomp = Math.sin(Math.toRadians(getTotalRotation()));
-        // double ccomp = Math.cos(Math.toRadians(getTotalRotation()));
         double scomp = Math.sin(Math.toRadians(rotation));
         double ccomp = Math.cos(Math.toRadians(rotation));
         for (int i = 0; i < input.length; i ++) {
-            // Vec2 o = input[i];
             Vec2 o = input[i].mul(scale);
-            // output[i] = new Vec2(((ccomp*o.x)+(scomp*o.y))*scale+translation.x, ((-scomp*o.x)+(ccomp*o.y))*scale+translation.y);
             output[i] = new Vec2(((ccomp*o.x)+(scomp*o.y))+translation.x, ((-scomp*o.x)+(ccomp*o.y))+translation.y);
         }
         if (parent != null) {

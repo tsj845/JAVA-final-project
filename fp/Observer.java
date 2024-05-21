@@ -14,61 +14,31 @@ import java.awt.event.*;
 /*
  * observes and relays events
  */
-
 public class Observer implements MouseListener, MouseMotionListener, KeyListener {
     private static final LinkedList<EventListener> listeners = new LinkedList<>();
     private static final Object MOUSE_LOCK = new Object();
     private static final Object KEY_LOCK = new Object();
     private static final Object SIG_LOCK = new Object();
     protected static final Observer ob = new Observer();
-    // private static class KeyData implements Comparable<KeyData> {
-    //     final int keycode;
-    //     int timedown = 0;
-    //     KeyData(int kc) {keycode = kc;}
-    //     @Override
-    //     public int compareTo(KeyData o) {
-    //         if (o == null) throw new NullPointerException();
-    //         if (o.keycode == keycode) return 0;
-    //         if (o.keycode > keycode) return -1;
-    //         return 1;
-    //     }
-    // }
-    // private static final TreeSet<KeyData> keys_down = new TreeSet<>();
     private static final TreeSet<Integer> keys_down = new TreeSet<>();
     private static volatile boolean mouse_down = false;
     private static volatile double mX, mY = 0.0d;
     static {init();}
-    private Observer() {
-    }
+    private Observer() {}
     private static void init() {
-        // try {StdDraw.c.await();} catch(Exception E) {E.printStackTrace();}
         StdDraw.frame.addKeyListener(ob);
         while (!StdDraw.inited);
         StdDraw.draw.addMouseListener(ob);
         StdDraw.draw.addMouseMotionListener(ob);
-        // StdDraw.c2.countDown();
-        // System.out.println("DONE C2");
     }
     public static void register(EventListener el) {
-        // synchronized(listeners) {
-        //     listeners.add(el);
-        // }
         listeners.add(el);
     }
     public static void unregister(EventListener el) {
-        // synchronized(listeners) {
-        //     listeners.remove(el);
-        // }
         listeners.remove(el);
     }
     public static void signal(Event sig) {
         synchronized(SIG_LOCK) {
-            // synchronized(listeners) {
-            //     for (EventListener el : listeners) {
-            //         el.trigger(sig);
-            //     }
-            // }
-            // System.out.println(listeners);
             for (EventListener el : listeners.toArray(EventListener[]::new)) {
                 el.trigger(sig);
             }
@@ -176,7 +146,6 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
     @Override
     public void keyPressed(KeyEvent e) {
         synchronized(KEY_LOCK) {
-            // Observer.keys_down.add(new KeyData(e.getKeyCode()));
             Observer.keys_down.add(e.getKeyCode());
             Observer.signal(new KEvent(EventType.KeyDown, Observer.vkcToChar(e.getKeyCode()), e.getKeyCode()));
         }
@@ -184,15 +153,6 @@ public class Observer implements MouseListener, MouseMotionListener, KeyListener
     @Override
     public void keyReleased(KeyEvent e) {
         synchronized(KEY_LOCK) {
-            // KeyData kd = null;
-            // for (KeyData d : keys_down) {
-            //     if (d.keycode == e.getKeyCode()) {kd = d;break;}
-            // }
-            // if (kd.timedown < 250) {
-            //     char c = Observer.vkcToChar(kd.keycode);
-            //     if (c != 0) Observer.signal(new KEvent(EventType.KeyPress, c));
-            // }
-            // Observer.keys_down.remove(kd);
             Observer.keys_down.remove(e.getKeyCode());
             Observer.signal(new KEvent(EventType.KeyUp, Observer.vkcToChar(e.getKeyCode()), e.getKeyCode()));
         }

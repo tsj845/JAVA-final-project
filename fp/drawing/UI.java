@@ -2,7 +2,6 @@ package fp.drawing;
 
 import java.awt.Color;
 import java.awt.Font;
-// import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 

@@ -60,10 +60,6 @@ public class Game implements EventListener {
                     paused = !paused;
                     freeze = paused;
                 }
-                // else if (ke.code == KeyEvent.VK_G) {
-                    // rem = true;
-                    // physTick();
-                // }
             }
         } else if (e.type.state()) {
             StateEvent se = (StateEvent)e;
@@ -96,7 +92,6 @@ public class Game implements EventListener {
     public static void addLaser(Laser l) {
         lasers.add(l);
     }
-    // private static boolean rem = false;
     private static void physTick() {
         HashSet<Entity> sched = new HashSet<>();
         boolean go = false;
@@ -105,10 +100,6 @@ public class Game implements EventListener {
             for (Laser l : lasers) {
                 if (sched.contains(l)) continue;
                 if (l.collides(a)) {
-                    // System.out.println(l);
-                    // System.out.println(l.getShape());
-                    // System.out.println(a);
-                    // System.out.println(a.getShape());
                     x = false;
                     sched.add(l);
                     sched.add(a);
@@ -122,20 +113,12 @@ public class Game implements EventListener {
             }
         }
         for (Entity e : sched) {
-            // if (rem) {
             e.destroy();
-            // } else {
-            //     e.getShape().getFirst().fill(new Color(230, 230, 230));
-            // }
         }
         if (go) {
             gameover = true;
             Observer.signal(Main.OVER);
         }
-        // rem = false;
-        // if (!sched.isEmpty()) {
-        //     freeze = true;
-        // }
     }
     private static void tick() {
         ticker ++;
@@ -150,12 +133,7 @@ public class Game implements EventListener {
                         diffLength = BDIFFLEN * diffMod;
                         afreq --;
                     }
-                    // System.out.printf("+1 A: %s\n", asteroids.getLast().transform().getTranslation());
                 }
-                // if (ticker % (2*afreq) == 0 && !asteroids.isEmpty()) {
-                //     // System.out.println("-1 A");
-                //     asteroids.getFirst().destroy();
-                // }
                 curr = Instant.now();
                 Observer.signal(SEvent.TICK);
                 physTick();

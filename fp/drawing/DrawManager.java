@@ -15,17 +15,8 @@ public class DrawManager implements EventListener {
     private static LinkedList<Drawable> stack = new LinkedList<>();
     private static DrawManager dm = new DrawManager();
     static {Observer.register(dm);}
-    private DrawManager() {
-    }
+    private DrawManager() {}
     private static void draw() {
-        // synchronized(stack) {
-        //     StdDraw.clear(StdDraw.BLACK);
-        //     for (Drawable s : stack) {
-        //         s.draw();
-        //     }
-        //     StdDraw.show();
-        // }
-        // StdDraw.clear();
         StdDraw.clear(StdDraw.BLACK);
         for (Drawable s : stack.toArray(Drawable[]::new)) {
             s.draw();
@@ -38,15 +29,9 @@ public class DrawManager implements EventListener {
         StdDraw.show();
     }
     public static void add(Drawable s) {
-        // synchronized(stack) {
-        //     stack.add(s);
-        // }
         stack.add(s);
     }
     public static boolean remove(Drawable s) {
-        // synchronized(stack) {
-        //     return stack.remove(s);
-        // }
         return stack.remove(s);
     }
     public static void clear() {

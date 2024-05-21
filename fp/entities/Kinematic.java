@@ -70,7 +70,6 @@ public abstract class Kinematic {
         if (params.friction() > 0) {
             double sx = Math.signum(velocity.x), sy = Math.signum(velocity.y);
             Vec2 dv = velocity.norm().mul(-Math.min(velocity.mag(), params.friction())).div(params.mass());
-            // System.out.println(dv);
             accelLinear(dv, dt);
             if (Math.signum(velocity.x) * sx < 0) {
                 velocity = new Vec2(0, velocity.y);
@@ -82,8 +81,6 @@ public abstract class Kinematic {
         if (velocity.mag() < Kinematic.MIN_SPEED) {
             velocity = new Vec2();
         }
-        // Vec2 vd = velocity.sub(velocity.norm().mul(-params.friction()).mul(dt));
-        // velocity = (vd.norm() == velocity.norm() || (vd.x==0.0d&&vd.y==0.0d)) ? vd : new Vec2();
         if (shape.minX() > 1+Kinematic.EDGE_TOLERANCE) {
             if (!wraps) {
                 escaped();

@@ -134,27 +134,6 @@ public class Collider {
         }
         return true;
     }
-    /*
-     * float sign (fPoint p1, fPoint p2, fPoint p3)
-{
-    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
-}
-
-bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
-{
-    float d1, d2, d3;
-    bool has_neg, has_pos;
-
-    d1 = sign(pt, v1, v2);
-    d2 = sign(pt, v2, v3);
-    d3 = sign(pt, v3, v1);
-
-    has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-    has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-    return !(has_neg && has_pos);
-}
-     */
     private static double _cTCPartial(Vec2 p1, Vec2 p2, Vec2 p3) {
         return (p1.x-p3.x)*(p2.y-p3.y)-(p2.x-p3.x)*(p1.y-p3.y);
     }
@@ -171,9 +150,6 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
     private static boolean cCircContains(Vec2 c, double r2, Vec2 p) {
         return c.sqDist(p) <= r2;
     }
-    // private static boolean cCircContains(Collider c, Vec2 p) {
-    //     return cCircContains(c.transform.getEquivalent().getTranslation(), c.data[1], p);
-    // }
     private static boolean cBoxBox(Collider c1, Collider c2) {
         CLine[] tc1 = cBoxGetTransformed(c1);
         CLine[] tc2 = cBoxGetTransformed(c2);
@@ -181,7 +157,6 @@ bool PointInTriangle (fPoint pt, fPoint v1, fPoint v2, fPoint v3)
         return cBoxContains(tc1, c, tc2[0].p1) || cBoxContains(tc1, c, tc2[1].p1) || cBoxContains(tc1, c, tc2[2].p1) || cBoxContains(tc1, c, tc2[3].p1);
     }
     private static boolean cBoxCirc(Collider c1, Collider c2) {
-        // System.out.println("BC");
         Vec2 ccenter = c2.transform.getEquivalent().getTranslation();
         CLine[] tcache = cBoxGetTransformed(c1);
         CLine hchk = new CLine(ccenter, tcache[0].angle-90, c2.data[0]).mirror(true);

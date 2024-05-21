@@ -2037,7 +2037,6 @@ import java.util.NoSuchElementException;
                  throw new NoSuchElementException("your program has already processed all keystrokes");
              }
              return keysTyped.remove(keysTyped.size() - 1);
-             // return keysTyped.removeLast();
          }
      }
  

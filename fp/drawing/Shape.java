@@ -177,24 +177,9 @@ public class Shape implements Drawable {
                 double[] x = new double[points.length], y = new double[points.length];
                 int i = 0;
                 for (Vec2 p : transform.apply(points)) {
-                // for (Vec2 p : points) {
                     x[i] = p.x;
                     y[i++] = p.y;
                 }
-                // if (stroke != null) {
-                //     double rad = roundness*strokewidth;
-                //     double ewidth = strokewidth - rad;
-                //     double[] x2 = new double[points.length], y2 = new double[points.length];
-                //     int j = 0;
-                //     for (Vec2 p : Transform.scaledBy(points, 1.5)) {
-                //     // for (Vec2 p : transform.apply(Transform.scaledAbs(points, ewidth))) {
-                //         x2[j] = p.x+0.5;
-                //         y2[j++] = p.y+0.5;
-                //     }
-                //     StdDraw.setPenRadius(rad);
-                //     StdDraw.setPenColor(stroke);
-                //     StdDraw.filledPolygon(x2, y2);
-                // }
                 if (stroke != null) {
                     StdDraw.setPenRadius(strokewidth);
                     StdDraw.setPenColor(stroke);

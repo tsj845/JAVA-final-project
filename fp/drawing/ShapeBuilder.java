@@ -33,7 +33,6 @@ public class ShapeBuilder {
         Vec2 pos;
         StyleData() {f=StdDraw.BLACK;s=null;sw=0;rot=0;pos=new Vec2();}
         StyleData copy() {StyleData sd = new StyleData();sd.f=f;sd.s=s;sd.sw=sw;sd.rot=rot;sd.pos=pos;return sd;}
-        // StyleData(Color fi, Color st, double lw, Vec2 p) {f=fi;s=st;sw=lw;pos=p;rot=0;}
     }
     private class ArgData {
         String[][] args;
@@ -218,9 +217,7 @@ public class ShapeBuilder {
                 case 1:
                     String[] parts = line.split(",");
                     String csv = fmtScope(fname, scopestack);
-                    // System.out.println(csv);
                     csv = csv.substring(csv.indexOf('<')+1, csv.indexOf('>'));
-                    // System.out.println(csv);
                     colors.put(csv+(csv.length()>0?".":"")+parts[0], getColor(parts, 1));
                     break;
                 case 2:
@@ -274,13 +271,10 @@ public class ShapeBuilder {
      * be converted
      */
     private String resolveUJName(char k, String inst) {
-        // System.out.println(inst);
         String[] parts = new String[]{inst.substring(0, (k=='J')?inst.indexOf('{'):inst.length()), (k=='J')?inst.substring(inst.indexOf('{')):""};
         String pat = ".*?<"+parts[0].substring(0, parts[0].lastIndexOf('.')).replace(".", "\\.")+">::"+parts[0].substring(parts[0].lastIndexOf('.')+1);
-        // System.out.println(pat);
         for (String pkey : defs.keySet()) {
             if (pkey.matches(pat)) {
-                // System.out.println(pkey);
                 return pkey+parts[1];
             }
         }
@@ -328,7 +322,6 @@ public class ShapeBuilder {
                 if (fdes) {
                     fdes = false;
                     finals.add("\u0003" + fname);
-                    // finals.add("#-file");
                 }
                 finals.add(l);
             }
@@ -347,19 +340,12 @@ public class ShapeBuilder {
         try {
             String fn = Path.of(file).getFileName().toString();
             parse(process(fn, readLines(fn)).toArray(String[]::new));
-            System.out.println(defs.entrySet());
         } catch (NoSuchElementException NSE) {
             NSE.printStackTrace();
             System.out.println(defs.entrySet());
             System.out.println(colors.entrySet());
             throw new IllegalStateException();
         }
-        // System.out.println(colors.entrySet());
-        // for (Entry<String, Instruction[]> ent : defs.entrySet()) {
-        //     System.out.print(ent.getKey());
-        //     System.out.print(" : ");
-        //     System.out.println(Arrays.toString(ent.getValue()));
-        // }
     }
     private String prepFuncI(Instruction i) {
         String[] p = i.data.toString().split("\\[");
@@ -370,9 +356,6 @@ public class ShapeBuilder {
             r += pd.params.get(k);
             r += p[j].substring(p[j].indexOf(']')+1);
         }
-        // System.out.println(i);
-        // System.out.println(pd);
-        // System.out.println(r);
         return r;
     }
     private String evalBFunc(String str) {
@@ -416,7 +399,6 @@ public class ShapeBuilder {
         return f;
     }
     private void executeR(String name, boolean function) {
-        // System.out.println("EXECR: " + name);
         Instruction[] codes = defs.get(name);
         int contd = 0;
         boolean poly = false, abs = false;
@@ -459,9 +441,7 @@ public class ShapeBuilder {
                             }
                             break;
                         case QP:
-                            // System.out.println("TESTQP");
                             if (!pd.provided.contains(Integer.parseInt(i.data.toString().substring(1)))) {
-                                // System.out.println("QPCONT");
                                 contd ++;
                             }
                             break;
@@ -616,18 +596,15 @@ public class ShapeBuilder {
         return pd;
     }
     private void executeC(String d) {
-        // System.out.println("CALLEXEC");
         String n = d.substring(0, d.indexOf('{'));
         Instruction fargs = defs.get(n)[0];
         ArgData ad = (ArgData)fargs.data;
         ParamData pd = parseArgs(ad, d.substring(d.indexOf('{')+1, d.length()-1).split(","));
-        // System.out.println(pd);
         argstack.addLast(pd);
         executeR(n, true);
         argstack.removeLast();
     }
     public BuildResult execute(String name, Transform t) {
-        // System.out.println(name);
         working = Shape.Group(t);
         workc = Collider.compoundCollider(working.transform);
         cstyle = new StyleData();
@@ -641,9 +618,5 @@ public class ShapeBuilder {
     }
     public BuildResult execute(String name) {
         return execute(name, new Transform());
-    }
-    public void debug() {
-        System.out.println(defs.keySet());
-        System.out.println(colors.keySet());
     }
 }
